@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#fbfbf6">
+<title>My Self Improvement Dashboard</title>
+<!-- App logo: browser tab icon, home-screen icon and install icon -->
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="shortcut icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<!-- Install as app (PC + mobile): opens full screen without browser UI -->
+<link rel="manifest" href="manifest.json">
+<meta name="application-name" content="Self Improvement">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Self Improvement">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<style>
+@media (display-mode: standalone), (display-mode: fullscreen){
+  .sheet{padding-top:calc(14px + env(safe-area-inset-top))}
+}
+/* =====================================================================
+   THEME TOKENS  (notebook paper, ink-blue pen, red margin, yellow highlighter)
+   ===================================================================== */
+:root{
+  --paper:#fbfbf6; --line:rgba(70,120,180,.20); --line2:rgba(70,120,180,.11); --margin:#e0626d;
+  --card:#fffffe; --card-line:#e2e5da; --ink:#1f2b45; --ink2:#566079;
+  --blue:#2c5aa0; --blue-soft:#e4edf9; --on-blue:#ffffff;
+  --ok:#1f7a4c; --ok-bg:#e1f3e8; --miss:#bf3a35; --miss-bg:#fbe5e3;
+  --pend:#7d6200; --pend-bg:#fcf1c7; --hol:#6a4ca6; --hol-bg:#ece6f9;
+  --hl:#fff1a0; --sticky:#fff0a3; --sticky-ink:#3a3210; --hole:#e3e5dc;
+  --shadow:0 1px 2px rgba(31,43,69,.08),0 8px 22px rgba(31,43,69,.07);
+  --hand:"Segoe Print","Bradley Hand","Chalkboard SE","Marker Felt","Comic Sans MS","Comic Neue",cursive;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --mx:64px; --lh:32px;
+}
+html[data-theme="dark"]{
+  --paper:#151a2a; --line:rgba(150,180,230,.13); --line2:rgba(150,180,230,.08); --margin:#b4505b;
+  --card:#1d2338; --card-line:#2c3550; --ink:#e8ecf7; --ink2:#a3adc6;
+  --blue:#8fb5f3; --blue-soft:#26334f; --on-blue:#0f1424;
+  --ok:#62d398; --ok-bg:#173626; --miss:#ff8c86; --miss-bg:#44201f;
+  --pend:#f1d068; --pend-bg:#3b3414; --hol:#c4abf6; --hol-bg:#2d2548;
+  --hl:#6a5c10; --sticky:#5a5220; --sticky-ink:#fdf3c0; --hole:#0f1320;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.28);
+}
+
+/* =====================================================================
+   BASE
+   ===================================================================== */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+html,body{max-width:100%;overflow-x:hidden}
+body{
+  margin:0;font:16px/1.5 var(--sans);color:var(--ink);background-color:var(--paper);
+  background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(var(--lh) - 1px),var(--line) calc(var(--lh) - 1px),var(--line) var(--lh));
+  background-position:0 14px;
+}
+body.modal-open{overflow:hidden}
+h1,h2,h3,h4,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--blue)}
+.skip{position:absolute;left:-999px;top:8px;background:var(--card);padding:8px 12px;border-radius:8px;z-index:100}
+.skip:focus{left:8px}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hand{font-family:var(--hand)}
+.muted{color:var(--ink2)}
+.small{font-size:.86rem}
+.pre{white-space:pre-line}
+
+/* The notebook page: red margin + binder holes live inside .sheet so they stay aligned with the content */
+.sheet{position:relative;max-width:1240px;margin:0 auto;min-height:100vh;padding:14px 24px 56px calc(var(--mx) + 30px)}
+.sheet::before{content:"";position:absolute;top:0;bottom:0;left:var(--mx);width:2px;background:var(--margin);opacity:.55;pointer-events:none}
+@media (min-width:900px){
+  .sheet::after{content:"";position:absolute;top:0;bottom:0;left:14px;width:22px;pointer-events:none;
+    background:radial-gradient(circle at 11px 11px,var(--hole) 0 8px,transparent 9px) repeat-y;background-size:22px 200px;background-position:0 70px;
+    filter:drop-shadow(inset 0 1px 1px rgba(0,0,0,.2))}
+}
+
+/* ---------- header / tabs (index-divider style) ---------- */
+.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:20px;border-bottom:2px solid var(--ink);padding-top:6px}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--hand);font-size:1.15rem;padding-bottom:8px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap}
+.tabs a,.bottom a{text-decoration:none;color:var(--ink)}
+.tabs a{display:flex;align-items:center;gap:7px;padding:9px 16px 8px;border:2px solid var(--ink);border-bottom:none;border-radius:12px 12px 0 0;background:var(--tab);margin-bottom:-2px;font-weight:600;font-size:.94rem;transition:transform .15s}
+.tabs a:hover{transform:translateY(-2px)}
+.tabs a[aria-current="page"]{background:var(--card);padding-top:12px}
+html[data-theme="dark"] .tabs a{border-color:var(--ink2)}
+html[data-theme="dark"] .tabs a:not([aria-current="page"]){color:#1f2b45}
+.bottom{display:none}
+@media (max-width:719px){
+  :root{--mx:14px}
+  .sheet{padding:10px 12px calc(92px + env(safe-area-inset-bottom)) 30px}
+  .tabs{display:none}
+  .top{border-bottom-width:1px;margin-bottom:14px}
+  .bottom{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--card-line);padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -4px 16px rgba(0,0,0,.08)}
+  .bottom a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:58px;font-size:.7rem;color:var(--ink2)}
+  .bottom a .ic{font-size:1.3rem;line-height:1}
+  .bottom a[aria-current="page"]{color:var(--blue);font-weight:700;box-shadow:inset 0 3px 0 var(--blue)}
+}
+.foot{margin-top:40px;font-size:.82rem;color:var(--ink2);font-family:var(--hand)}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--card-line);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;min-width:0}
+.page{background-color:var(--card);background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 29px,var(--line2) 29px,var(--line2) 30px)}
+.stack{display:grid;gap:20px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(min(100%,290px),1fr))}
+.page-h{font-family:var(--hand);font-size:clamp(1.5rem,4vw,2.1rem);line-height:1.2;margin-bottom:4px}
+.sec-h{font-family:var(--serif);font-size:1.25rem;margin-bottom:10px}
+.hl{background:linear-gradient(transparent 58%,var(--hl) 58%,var(--hl) 92%,transparent 92%);padding:0 3px}
+
+/* ---------- buttons / fields ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:10px;border:1.5px solid var(--ink);background:var(--card);cursor:pointer;font-weight:600;transition:transform .12s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--blue);border-color:var(--blue);color:var(--on-blue)}
+.btn.danger{background:var(--miss);border-color:var(--miss);color:#fff}
+.btn.ghost{border-color:var(--card-line)}
+.btn[disabled]{opacity:.45;cursor:not-allowed;transform:none}
+.btn.sm{min-height:38px;padding:0 12px;font-size:.9rem}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px}
+.linkbtn{background:none;border:none;color:var(--blue);text-decoration:underline;cursor:pointer;padding:6px 2px;min-height:36px}
+input[type=text],input[type=date],input[type=search],select{min-height:44px;padding:0 12px;border-radius:10px;border:1.5px solid var(--card-line);background:var(--card);width:100%}
+input[type=text]:focus,input[type=date]:focus,input[type=search]:focus,select:focus{border-color:var(--blue)}
+label.field{display:grid;gap:4px;font-size:.9rem;font-weight:600}
+
+.switch{display:flex;align-items:center;gap:12px;min-height:44px;cursor:pointer}
+.switch input{position:absolute;opacity:0;width:44px;height:26px;margin:0}
+.switch .trk{flex:none;width:44px;height:26px;border-radius:99px;background:var(--card-line);border:1.5px solid var(--ink2);position:relative;transition:background .15s}
+.switch .trk::after{content:"";position:absolute;top:2px;left:2px;width:19px;height:19px;border-radius:50%;background:var(--ink2);transition:transform .15s,background .15s}
+.switch input:checked+.trk{background:var(--blue);border-color:var(--blue)}
+.switch input:checked+.trk::after{transform:translateX(18px);background:var(--on-blue)}
+.switch input:focus-visible+.trk{outline:3px solid var(--blue);outline-offset:2px}
+
+/* ---------- hero ---------- */
+.hero{display:grid;grid-template-columns:1.15fr 1fr;gap:28px;padding:24px 26px;position:relative}
+.hand-title{font-family:var(--hand);font-weight:700;font-size:clamp(1.3rem,3.4vw,2.05rem);line-height:1.25;letter-spacing:.01em}
+.weekday{font-family:var(--serif);font-size:clamp(2rem,6vw,3.2rem);line-height:1.05;margin-top:16px}
+.datelong{font-size:1.2rem;margin-top:2px}
+.clock{font-family:var(--hand);font-size:clamp(1.5rem,4vw,2.1rem);margin-top:8px;font-variant-numeric:tabular-nums}
+.mini-h{font-family:var(--serif);font-size:1.05rem;margin-bottom:8px}
+.blocks{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;height:24px}
+.blocks i{border-radius:3px;background:var(--blue-soft);transition:background .3s}
+.blocks i.on{background:var(--blue)}
+.bigpct{font-family:var(--hand);font-size:clamp(2rem,5vw,2.8rem);line-height:1;margin:10px 0 4px}
+.counts{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-weight:600}
+.counts .ok{color:var(--ok)}.counts .no{color:var(--miss)}.counts .pe{color:var(--pend)}
+@media (max-width:760px){.hero{grid-template-columns:1fr;gap:20px;padding:20px 18px}}
+
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.stat{padding:14px 16px}
+.stat b{display:block;font-family:var(--hand);font-size:1.7rem;line-height:1.15}
+.stat span{font-size:.86rem;color:var(--ink2)}
+.bar{height:10px;border-radius:99px;background:var(--blue-soft);overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:var(--blue);border-radius:99px;transition:width .4s}
+
+.dash-cols{display:grid;grid-template-columns:2fr 1fr;gap:20px;align-items:start}
+@media (max-width:980px){.dash-cols{grid-template-columns:1fr}}
+
+.sticky{position:relative;background:var(--sticky);color:var(--sticky-ink);padding:22px 20px 18px;font-family:var(--hand);transform:rotate(-1.1deg);box-shadow:2px 5px 14px rgba(0,0,0,.14);border-radius:3px}
+.sticky::before{content:"";position:absolute;top:-10px;left:50%;width:84px;height:22px;transform:translateX(-50%) rotate(2deg);background:rgba(255,255,255,.55);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.sticky q{display:block;font-size:1.12rem;line-height:1.55;quotes:none}
+.sticky small{display:block;margin-top:10px;opacity:.8}
+
+/* ---------- task cards ---------- */
+.task{position:relative;display:flex;flex-direction:column;gap:10px;border-left:8px solid var(--tab,var(--blue))}
+.task.completed{background:linear-gradient(var(--ok-bg),var(--ok-bg)),var(--card)}
+.task.missed{background:linear-gradient(var(--miss-bg),var(--miss-bg)),var(--card)}
+.task-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.task-h h3{font-family:var(--serif);font-size:1.12rem;line-height:1.25}
+.task-h .tag{font-family:var(--hand);font-size:.95rem;color:var(--ink2)}
+.win{font-family:var(--hand);font-size:1.02rem}
+.badge{flex:none;font-size:.74rem;font-weight:800;letter-spacing:.03em;padding:4px 9px;border-radius:99px;border:1.5px solid currentColor;white-space:nowrap}
+.badge.completed{color:var(--ok);background:var(--ok-bg)}
+.badge.missed{color:var(--miss);background:var(--miss-bg)}
+.badge.pending{color:var(--pend);background:var(--pend-bg)}
+.badge.holiday{color:var(--hol);background:var(--hol-bg)}
+.badge.na{color:var(--ink2)}
+.btn.woke{width:100%;min-height:56px;font-size:1.1rem;letter-spacing:.04em;background:var(--blue);color:var(--on-blue);border-color:var(--blue)}
+.btn.woke[aria-disabled="true"]{background:var(--card);color:var(--ink2);border-style:dashed;border-color:var(--ink2)}
+.check{display:flex;align-items:center;gap:12px;min-height:48px;cursor:pointer;font-weight:600}
+.check input{position:absolute;opacity:0;width:28px;height:28px;margin:0}
+.check .bx{flex:none;width:28px;height:28px;border:2.5px solid var(--ink);border-radius:7px;display:grid;place-items:center;background:var(--card);transition:background .15s}
+.check .bx::after{content:"";width:13px;height:7px;border-left:3.5px solid var(--on-blue);border-bottom:3.5px solid var(--on-blue);transform:rotate(-48deg) scale(0);transition:transform .15s;margin-top:-3px}
+.check input:checked+.bx{background:var(--ok);border-color:var(--ok)}
+.check input:checked+.bx::after{transform:rotate(-48deg) scale(1)}
+.check input:focus-visible+.bx{outline:3px solid var(--blue);outline-offset:2px}
+.check input[aria-disabled="true"]+.bx{opacity:.55;border-style:dashed}
+.stamp{font-family:var(--hand);color:var(--ok);font-size:1.02rem}
+.alert{padding:10px 12px;border-radius:10px;font-size:.92rem;background:var(--miss-bg);color:var(--miss);border:1.5px solid currentColor;white-space:pre-line;font-weight:600}
+.alert.warn{background:var(--pend-bg);color:var(--pend)}
+.hint{font-size:.88rem;color:var(--ink2)}
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;text-align:center;border-top:1.5px dashed var(--card-line);padding-top:10px}
+.mini-stats b{display:block;font-family:var(--hand);font-size:1.25rem}
+.mini-stats span{font-size:.72rem;color:var(--ink2);line-height:1.1;display:block}
+.dots{display:flex;gap:4px;flex-wrap:wrap}
+.dots i{width:14px;height:14px;border-radius:50%;background:var(--card-line)}
+.dots i.completed{background:var(--ok)}.dots i.missed{background:var(--miss)}.dots i.holiday{background:var(--hol)}
+
+/* ---------- timeline ---------- */
+.timeline{list-style:none;margin:0;padding:0 0 0 18px;border-left:2px dashed var(--ink2);display:grid;gap:14px}
+.timeline li{position:relative}
+.timeline li::before{content:"";position:absolute;left:-26px;top:5px;width:12px;height:12px;border-radius:50%;background:var(--card);border:2.5px solid var(--ink2)}
+.timeline li.now::before{background:var(--blue);border-color:var(--blue);box-shadow:0 0 0 5px var(--blue-soft)}
+.tl-time{font-family:var(--hand);font-size:1rem;font-weight:700}
+.tl-item{display:flex;gap:8px;align-items:center;padding:7px 10px;margin-top:6px;border-radius:9px;border:1.5px solid var(--card-line);font-size:.95rem;flex-wrap:wrap}
+.tl-item.active{background:var(--blue-soft);border-color:var(--blue);font-weight:700}
+.tl-item small{color:var(--ink2);font-weight:500}
+.tl-end{font-size:.84rem;color:var(--ink2);margin-top:4px}
+
+/* ---------- calendar ---------- */
+.cal-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cal-year{font-family:var(--hand);font-size:2rem}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:.88rem;margin:10px 0 0}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:20px;height:20px;border-radius:6px;display:inline-grid;place-items:center;font-style:normal;font-size:.75rem;font-weight:700}
+.months{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,262px),1fr));gap:16px}
+.month{padding:14px 12px}
+.month h3{font-family:var(--serif);font-size:1.05rem;margin-bottom:6px}
+.wk,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.wk span{font-size:.68rem;text-align:center;color:var(--ink2);font-weight:700}
+.day{border:none;background:var(--card-line);border-radius:7px;min-height:38px;padding:2px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05;font-size:.78rem;color:var(--ink)}
+.day .ds{font-size:.7rem;font-weight:800;margin-top:1px}
+.day[data-s="completed"],.lg-completed{background:var(--ok-bg);color:var(--ok)}
+.day[data-s="missed"],.lg-missed{background:var(--miss-bg);color:var(--miss)}
+.day[data-s="partial"],.lg-partial,.day[data-s="pending"]{background:var(--pend-bg);color:var(--pend)}
+.day[data-s="holiday"],.lg-holiday{background:var(--hol-bg);color:var(--hol)}
+.day[data-s="future"],.day[data-s="na"],.lg-future{background:transparent;color:var(--ink2);border:1px dashed var(--card-line)}
+.day[data-today="1"]{outline:2.5px solid var(--blue);outline-offset:1px}
+.day.blank{visibility:hidden;pointer-events:none}
+.d-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1.5px dashed var(--card-line)}
+.d-row:last-of-type{border-bottom:none}
+
+/* ---------- progress ---------- */
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.sum-grid .card b{display:block;font-family:var(--hand);font-size:2.2rem;line-height:1.1}
+.rate{display:grid;gap:6px;margin-bottom:14px}
+.rate-h{display:flex;justify-content:space-between;gap:8px;font-weight:600}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--ink2);font-size:11px;font-family:var(--sans);text-anchor:middle}
+.chart .c-bar{fill:var(--blue)}
+.chart .c-today{fill:var(--ok)}
+.chart .c-na{fill:var(--ink2);opacity:.5}
+.chart .c-grid{stroke:var(--card-line);stroke-width:1}
+.year-card{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+
+/* ---------- journal ---------- */
+.journal{display:grid;grid-template-columns:290px 1fr;gap:18px;align-items:start}
+@media (max-width:900px){.journal{grid-template-columns:1fr}}
+.note-list{display:grid;gap:8px;max-height:430px;overflow:auto;margin-top:10px;padding:2px}
+@media (max-width:900px){.note-list{max-height:220px}}
+.note-item{text-align:left;border:1.5px solid var(--card-line);background:var(--card);border-radius:10px;padding:9px 12px;cursor:pointer;display:grid;gap:2px;width:100%}
+.note-item.active{border-color:var(--blue);background:var(--blue-soft)}
+.note-item b{font-family:var(--serif);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.note-item small{color:var(--ink2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px;border:1.5px solid var(--card-line);border-radius:12px;background:var(--card);margin:12px 0 10px}
+.tb button.t{min-width:40px;min-height:40px;border:1.5px solid var(--card-line);background:var(--card);border-radius:8px;cursor:pointer;font-weight:700}
+.tb button.t:hover{background:var(--blue-soft)}
+.tb select{width:auto;min-height:40px;padding:0 8px}
+.tb .sep{width:1px;height:26px;background:var(--card-line);margin:0 2px}
+.sw{display:inline-flex;gap:4px;align-items:center}
+.sw button{width:24px;height:24px;border-radius:50%;border:2px solid var(--card);box-shadow:0 0 0 1.5px var(--ink2);cursor:pointer;padding:0}
+.sw input[type=color]{width:34px;height:34px;padding:0;border:1.5px solid var(--card-line);border-radius:8px;background:none;cursor:pointer}
+.editor{min-height:340px;max-height:62vh;overflow:auto;padding:6px 14px 6px 62px;line-height:28px;font-size:1.05rem;border:1.5px solid var(--card-line);border-radius:12px;outline:none;
+  background-color:var(--card);
+  background-image:linear-gradient(to right,transparent 48px,var(--margin) 48px,var(--margin) 49.5px,transparent 49.5px),repeating-linear-gradient(to bottom,transparent 0,transparent 27px,var(--line) 27px,var(--line) 28px);
+  background-attachment:local;background-position:0 6px,0 6px;overflow-wrap:anywhere}
+.editor:focus{border-color:var(--blue)}
+.editor[data-empty="true"]::before{content:attr(data-placeholder);color:var(--ink2);pointer-events:none;position:absolute;font-family:var(--hand)}
+.editor h1{font-size:1.7rem;line-height:36px;margin:0}.editor h2{font-size:1.35rem;line-height:32px;margin:0}.editor h3{font-size:1.15rem;margin:0}
+.editor p,.editor div{margin:0}
+.editor ul,.editor ol{margin:0;padding-left:26px}
+.editor-wrap{position:relative}
+.j-meta{display:grid;grid-template-columns:1fr 190px;gap:12px}
+@media (max-width:560px){.j-meta{grid-template-columns:1fr}}
+.save-state{font-size:.86rem;color:var(--ink2);margin-top:8px;min-height:1.4em}
+
+/* ---------- settings ---------- */
+.set-sec{display:grid;gap:12px}
+.set-sec h2{font-family:var(--serif);font-size:1.2rem}
+.opt-row{display:flex;gap:10px;flex-wrap:wrap}
+.opt-row label{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 14px;border:1.5px solid var(--card-line);border-radius:10px;cursor:pointer}
+.opt-row input{width:18px;height:18px}
+.hol-list{display:grid;gap:6px;max-height:340px;overflow:auto}
+.hol-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;border:1.5px solid var(--card-line);border-radius:10px}
+.hol-add{display:grid;grid-template-columns:170px 1fr auto;gap:10px;align-items:end}
+@media (max-width:640px){.hol-add{grid-template-columns:1fr}}
+details.adv{border:2px dashed var(--miss);border-radius:14px;padding:4px 16px;background:var(--card)}
+details.adv summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;color:var(--miss)}
+.danger-zone{padding:12px 0 14px;display:grid;gap:10px}
+.callout{padding:10px 12px;border-radius:10px;background:var(--blue-soft);font-size:.9rem}
+.callout.warn{background:var(--pend-bg);color:var(--pend)}
+
+/* ---------- modal / toast / banner ---------- */
+.backdrop{position:fixed;inset:0;background:rgba(15,20,36,.55);display:grid;place-items:center;padding:16px;z-index:100;overflow:auto}
+.modal{width:100%;max-width:480px;background:var(--card);border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.4);border:2px solid var(--ink);display:grid;gap:14px;max-height:92vh;overflow:auto;animation:pop .18s ease-out}
+.modal.danger{border-color:var(--miss);border-width:3px}
+.modal h2{font-family:var(--serif);font-size:1.3rem}
+.modal.danger h2{color:var(--miss)}
+.m-actions{display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+.m-input{display:grid;gap:6px;font-size:.92rem}
+@keyframes pop{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+#toasts{position:fixed;z-index:200;left:12px;right:12px;bottom:calc(76px + env(safe-area-inset-bottom));display:grid;gap:8px;justify-items:center;pointer-events:none}
+@media (min-width:720px){#toasts{bottom:24px}}
+.toast{pointer-events:auto;max-width:460px;width:100%;background:var(--ink);color:var(--paper);padding:12px 16px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);white-space:pre-line;font-size:.94rem;animation:pop .18s ease-out}
+.toast.err{background:var(--miss);color:#fff}
+.toast.ok{background:var(--ok);color:#fff}
+html[data-theme="dark"] .toast.ok,html[data-theme="dark"] .toast.err{color:#0f1424}
+#banner .callout{margin-bottom:14px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#view">Skip to content</a>
+<div class="sheet">
+  <header class="top">
+    <div class="brand"><span aria-hidden="true">📓</span><span>Self Improvement</span></div>
+    <nav class="tabs" id="tabs" aria-label="Main navigation"></nav>
+  </header>
+  <div id="banner"></div>
+  <main id="view" tabindex="-1"><noscript><div class="card">This dashboard needs JavaScript. Please enable it in your browser.</div></noscript></main>
+  <footer class="foot">Everything lives in this browser. No servers, no tracking.</footer>
+</div>
+<nav class="bottom" id="bottomNav" aria-label="Main navigation (mobile)"></nav>
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+
+/* =====================================================================
+   1. CONFIGURATION
+   ===================================================================== */
+var APP_ID = 'self-improvement-dashboard';
+var STORAGE_KEY = 'sid.data.v1';
+var SCHEMA = 1;
+var HR = 3600, MIN = 60;
+
+/* Each task: window start/end in seconds since local midnight. start/end = null means "all day, manual". */
+var TASKS = [
+  { id: 'earlyWakeUp', name: 'Early Daily Wake Up', icon: '☀', color: '#f2b84b', kind: 'button',
+    start: 4 * HR, end: 6 * HR, noun: 'Your wake-up tracking', missStyle: 'wake',
+    remind: { title: '☀ Wake Up Time', body: 'Your early wake-up tracking window has started.' } },
+  { id: 'selfControl', name: 'No M....N Days', tagline: 'Be self control', icon: '🧠', color: '#8e7cc3', kind: 'toggle',
+    start: null, end: null },
+  { id: 'communication', name: 'Communication Improve Time', icon: '🗣', color: '#5aa9e6', kind: 'toggle',
+    start: 4 * HR, end: 6 * HR, noun: 'Communication improvement',
+    remind: { title: '🗣 Communication Improvement', body: 'Your communication improvement session has started.' } },
+  { id: 'academics', name: 'Academics Preparation', icon: '📚', color: '#e57f84', kind: 'toggle',
+    start: 15 * HR + 40 * MIN, end: 18 * HR, noun: 'Academic preparation',
+    remind: { title: '📚 Academics Preparation', body: 'Your academic preparation time has started.' } },
+  { id: 'skillDevelopment', name: 'Skill Development Time', icon: '💻', color: '#5fbf8f', kind: 'toggle',
+    start: 18 * HR, end: 20 * HR, noun: 'Skill development',
+    remind: { title: '💻 Skill Development', body: 'Your skill development session has started.' } }
+];
+var TASK_BY_ID = {}; TASKS.forEach(function (t) { TASK_BY_ID[t.id] = t; });
+
+/* Indian holidays. 2026 = Central Government gazetted list (DoPT order of 3 July 2025).
+   moon:true => date depends on moon sighting and may shift by a day. State/regional holidays
+   (Pongal, Tamil New Year, Onam, etc.) are NOT included: add them in Settings -> Holiday Settings. */
+var BUILTIN_HOLIDAYS = {
+  '2026': [
+    { date: '2026-01-26', name: 'Republic Day' },
+    { date: '2026-03-04', name: 'Holi' },
+    { date: '2026-03-21', name: 'Id-ul-Fitr', moon: true },
+    { date: '2026-03-26', name: 'Ram Navami' },
+    { date: '2026-03-31', name: 'Mahavir Jayanti' },
+    { date: '2026-04-03', name: 'Good Friday' },
+    { date: '2026-05-01', name: 'Buddha Purnima' },
+    { date: '2026-05-27', name: 'Id-ul-Zuha (Bakrid)', moon: true },
+    { date: '2026-06-26', name: 'Muharram', moon: true },
+    { date: '2026-08-15', name: 'Independence Day' },
+    { date: '2026-08-26', name: 'Milad-un-Nabi', moon: true },
+    { date: '2026-09-04', name: 'Janmashtami' },
+    { date: '2026-10-02', name: 'Mahatma Gandhi Jayanti' },
+    { date: '2026-10-20', name: 'Dussehra (Vijaya Dashami)' },
+    { date: '2026-11-08', name: 'Diwali (Deepavali)' },
+    { date: '2026-11-24', name: 'Guru Nanak Jayanti' },
+    { date: '2026-12-25', name: 'Christmas Day' }
+  ]
+};
+/* Fixed-date national holidays seeded for years that have no built-in full list. */
+var FIXED_NATIONAL = [['01-26', 'Republic Day'], ['08-15', 'Independence Day'], ['10-02', 'Mahatma Gandhi Jayanti'], ['12-25', 'Christmas Day']];
+
+var QUOTES = [
+  'Small progress every day becomes extraordinary progress over time.',
+  'Show up at the hour you promised yourself, even when no one is watching.',
+  'Discipline is a quiet favour you do for the person you will be next year.',
+  'One focused hour beats five distracted ones.',
+  'You do not have to feel ready. You only have to begin.',
+  'Consistency is boring on any single day and powerful across a hundred.',
+  'Protect the morning, and the rest of the day gets easier.',
+  'Skills are built in the unglamorous minutes.',
+  'A missed day is information, not a verdict. Return to the next one.',
+  'Say it aloud, write it down, repeat it tomorrow. That is how communication improves.',
+  'Self-control is choosing what you want most over what you want now.',
+  'Let today\'s effort be small enough to finish and honest enough to count.',
+  'The streak matters less than the person it turns you into.',
+  'Study the hard chapter first. The easy ones will be grateful.',
+  'Energy follows action more often than the other way round.',
+  'Ten honest minutes today beat a perfect plan for tomorrow.',
+  'Be patient with the process, impatient with the excuses.',
+  'Rest days are part of the plan, not a break from it.',
+  'Clear desk, clear head, clear start.',
+  'Your future self is already grateful for this hour.',
+  'Do the next right thing, then the one after it.',
+  'Learn a little, write it down, use it tomorrow.',
+  'Progress rarely announces itself. Check the calendar and you will see it.',
+  'Courage, here, looks like opening the book on time.',
+  'Win the first two hours and the day usually follows.'
+];
+
+var MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var WEEKDAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var NAV = [
+  { id: 'dashboard', icon: '🏠', label: 'Dashboard', tab: '#ffe08a' },
+  { id: 'calendar', icon: '📅', label: 'Calendar', tab: '#bfe3c9' },
+  { id: 'progress', icon: '📊', label: 'Progress', tab: '#bcd7f5' },
+  { id: 'journal', icon: '📝', label: 'Journal', tab: '#f5c4cc' },
+  { id: 'settings', icon: '⚙', label: 'Settings', tab: '#d9cdf0' }
+];
+var DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+/* =====================================================================
+   2. SMALL UTILITIES
+   ===================================================================== */
+function $(s, r) { return (r || document).querySelector(s); }
+function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function isObj(v) { return v !== null && typeof v === 'object' && !Array.isArray(v); }
+function clamp(n, a, b) { return Math.min(b, Math.max(a, n)); }
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+function uid() { return 'n_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+/* =====================================================================
+   3. DATE / TIME UTILITIES  (always the device's local time)
+   ===================================================================== */
+function pad(n) { return String(n).padStart(2, '0'); }
+function dateKey(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function parseKey(k) { var p = k.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+function addDays(k, n) { var d = parseKey(k); d.setDate(d.getDate() + n); return dateKey(d); }
+function validKey(k) { return typeof k === 'string' && DATE_RE.test(k) && dateKey(parseKey(k)) === k; }
+function secOfDay(d) { return d.getHours() * 3600 + d.getMinutes() * 60 + d.getSeconds(); }
+function hhmm(d) { return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function fmtSec(s, padHour) {
+  var h = Math.floor(s / 3600) % 24, m = Math.floor((s % 3600) / 60);
+  var h12 = h % 12 || 12;
+  return (padHour === false ? h12 : pad(h12)) + ':' + pad(m) + ' ' + (h >= 12 ? 'PM' : 'AM');
+}
+function fmtHHMM(str) {
+  if (!/^\d{2}:\d{2}$/.test(str || '')) return '—';
+  var p = str.split(':').map(Number); return fmtSec(p[0] * 3600 + p[1] * 60);
+}
+function fmtClock(d) {
+  var h = d.getHours(), h12 = h % 12 || 12;
+  return pad(h12) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds()) + ' ' + (h >= 12 ? 'PM' : 'AM');
+}
+function longDate(k) { var d = parseKey(k); return d.getDate() + ' ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
+function eachDay(from, to, fn) { for (var k = from; k <= to; k = addDays(k, 1)) fn(k); }
+function dayOfYear(d) { return Math.floor((d - new Date(d.getFullYear(), 0, 0)) / 86400000); }
+function yearElapsed(now) {
+  var y = now.getFullYear();
+  return clamp((now - new Date(y, 0, 1)) / (new Date(y + 1, 0, 1) - new Date(y, 0, 1)) * 100, 0, 100);
+}
+function dur(s) {
+  s = Math.max(0, s);
+  var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60);
+  if (h > 0) return h + 'h ' + m + 'm';
+  if (m > 0) return m + ' min';
+  return (s % 60) + ' sec';
+}
+
+/* =====================================================================
+   4. DATA STORAGE  (localStorage with in-memory fallback)
+   ===================================================================== */
+var Store = {
+  usable: false, mem: null,
+  init: function () {
+    try { var k = '__sid_probe__'; localStorage.setItem(k, '1'); localStorage.removeItem(k); this.usable = true; }
+    catch (e) { this.usable = false; }
+  },
+  read: function () {
+    if (!this.usable) return this.mem;
+    try { return localStorage.getItem(STORAGE_KEY); } catch (e) { return null; }
+  },
+  write: function (s) {
+    this.mem = s;
+    if (!this.usable) return false;
+    try { localStorage.setItem(STORAGE_KEY, s); return true; } catch (e) { return false; }
+  },
+  remove: function () {
+    this.mem = null;
+    if (!this.usable) return;
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+  },
+  stash: function (name, s) { try { if (this.usable) localStorage.setItem(name, s); } catch (e) { /* ignore */ } }
+};
+
+function defaultSettings() {
+  return {
+    theme: 'auto', holidaysEnabled: true, weeklyOff: [], streakThreshold: 100,
+    notifications: { enabled: false, atStart: true, closing: true, closingMins: 15 },
+    journal: { autosave: true, fontSize: 3 }
+  };
+}
+function defaultState(now) {
+  now = now || new Date();
+  return {
+    schema: SCHEMA, settings: defaultSettings(), records: {}, holidays: {}, notes: [],
+    meta: { createdAt: now.toISOString(), startDate: dateKey(now), startSec: secOfDay(now),
+            lastProcessed: dateKey(now), lastOpenYear: now.getFullYear(), notified: {} }
+  };
+}
+
+/* Turns ANY parsed object (saved data or an imported backup) into a safe, complete state. */
+function normalizeState(raw) {
+  var s = defaultState();
+  if (!isObj(raw)) return s;
+  var rs = isObj(raw.settings) ? raw.settings : {};
+  if (['auto', 'light', 'dark'].indexOf(rs.theme) >= 0) s.settings.theme = rs.theme;
+  if (typeof rs.holidaysEnabled === 'boolean') s.settings.holidaysEnabled = rs.holidaysEnabled;
+  if (Array.isArray(rs.weeklyOff)) s.settings.weeklyOff = rs.weeklyOff.filter(function (n) { return Number.isInteger(n) && n >= 0 && n <= 6; });
+  if ([100, 80, 60].indexOf(rs.streakThreshold) >= 0) s.settings.streakThreshold = rs.streakThreshold;
+  if (isObj(rs.notifications)) {
+    var n = rs.notifications;
+    s.settings.notifications.enabled = n.enabled === true;
+    if (typeof n.atStart === 'boolean') s.settings.notifications.atStart = n.atStart;
+    if (typeof n.closing === 'boolean') s.settings.notifications.closing = n.closing;
+    if ([10, 15, 30].indexOf(n.closingMins) >= 0) s.settings.notifications.closingMins = n.closingMins;
+  }
+  if (isObj(rs.journal)) {
+    if (typeof rs.journal.autosave === 'boolean') s.settings.journal.autosave = rs.journal.autosave;
+    if ([2, 3, 4, 5].indexOf(rs.journal.fontSize) >= 0) s.settings.journal.fontSize = rs.journal.fontSize;
+  }
+
+  var earliest = null;
+  if (isObj(raw.records)) {
+    Object.keys(raw.records).forEach(function (d) {
+      var day = raw.records[d];
+      if (!validKey(d) || !isObj(day)) return;
+      TASKS.forEach(function (t) {
+        var r = day[t.id];
+        if (!isObj(r) || (r.status !== 'completed' && r.status !== 'missed')) return;
+        var rec = { date: d, taskId: t.id, status: r.status };
+        if (r.status === 'completed' && /^\d{2}:\d{2}$/.test(r.completedAt || '')) rec.completedAt = r.completedAt;
+        if (!s.records[d]) s.records[d] = {};
+        s.records[d][t.id] = rec;
+        if (!earliest || d < earliest) earliest = d;
+      });
+    });
+  }
+  if (isObj(raw.holidays)) {
+    Object.keys(raw.holidays).forEach(function (y) {
+      if (!/^\d{4}$/.test(y) || !Array.isArray(raw.holidays[y])) return;
+      var seen = {};
+      s.holidays[y] = raw.holidays[y].filter(function (h) {
+        if (!isObj(h) || !validKey(h.date) || h.date.slice(0, 4) !== y || seen[h.date]) return false;
+        seen[h.date] = 1; return true;
+      }).map(function (h) {
+        var o = { date: h.date, name: String(h.name || 'Holiday').slice(0, 80) };
+        if (h.moon) o.moon = true; if (h.custom) o.custom = true; return o;
+      });
+    });
+  }
+  if (Array.isArray(raw.notes)) {
+    var ids = {};
+    raw.notes.forEach(function (nt) {
+      if (!isObj(nt) || typeof nt.id !== 'string' || ids[nt.id]) return;
+      ids[nt.id] = 1;
+      var nowIso = new Date().toISOString();
+      s.notes.push({
+        id: nt.id.slice(0, 60), title: String(nt.title || '').slice(0, 200),
+        date: validKey(nt.date) ? nt.date : dateKey(new Date()),
+        html: sanitizeHtml(String(nt.html || '')),
+        created: typeof nt.created === 'string' ? nt.created : nowIso,
+        updated: typeof nt.updated === 'string' ? nt.updated : nowIso
+      });
+    });
+  }
+  var m = isObj(raw.meta) ? raw.meta : {};
+  var today = dateKey(new Date());
+  s.meta.createdAt = typeof m.createdAt === 'string' ? m.createdAt : s.meta.createdAt;
+  s.meta.startDate = validKey(m.startDate) ? m.startDate : (earliest || today);
+  if (earliest && earliest < s.meta.startDate) s.meta.startDate = earliest;
+  s.meta.startSec = Number.isInteger(m.startSec) && m.startSec >= 0 && m.startSec < 86400 ? m.startSec : 0;
+  s.meta.lastProcessed = validKey(m.lastProcessed) ? m.lastProcessed : s.meta.startDate;
+  s.meta.lastOpenYear = Number.isInteger(m.lastOpenYear) ? m.lastOpenYear : new Date().getFullYear();
+  s.meta.notified = isObj(m.notified) ? m.notified : {};
+  return s;
+}
+
+var state = null;
+var storageWarned = false;
+function save() {
+  var ok = Store.write(JSON.stringify(state));
+  if (!ok && !storageWarned) {
+    storageWarned = true;
+    toast(Store.usable ? 'Could not save: browser storage is full. Export a backup and free some space.'
+                       : 'Storage is unavailable in this browser mode. Progress will be lost when you close the tab. Export a backup often.', 'err', 7000);
+  }
+  return ok;
+}
+function loadState() {
+  var raw = Store.read();
+  if (!raw) return defaultState();
+  try { return normalizeState(JSON.parse(raw)); }
+  catch (e) {
+    Store.stash('sid.corrupt.' + Date.now(), raw);
+    setTimeout(function () { toast('Saved data could not be read, so a fresh dashboard was started. The damaged copy was kept in browser storage.', 'err', 8000); }, 400);
+    return defaultState();
+  }
+}
+
+/* =====================================================================
+   5. HOLIDAY LOGIC
+   ===================================================================== */
+function defaultHolidays(y) {
+  y = String(y);
+  if (BUILTIN_HOLIDAYS[y]) return BUILTIN_HOLIDAYS[y].map(function (h) { return Object.assign({}, h); });
+  return FIXED_NATIONAL.map(function (p) { return { date: y + '-' + p[0], name: p[1] }; });
+}
+function getHolidayList(y) { y = String(y); return state.holidays[y] || defaultHolidays(y); }
+function materializeHolidays(y) { y = String(y); if (!state.holidays[y]) state.holidays[y] = defaultHolidays(y); return state.holidays[y]; }
+function holidayFor(key) {
+  if (!state.settings.holidaysEnabled) return null;
+  var list = getHolidayList(key.slice(0, 4));
+  for (var i = 0; i < list.length; i++) if (list[i].date === key) return { name: list[i].name, type: 'holiday' };
+  if (state.settings.weeklyOff.indexOf(parseKey(key).getDay()) >= 0) return { name: 'Weekly rest day', type: 'weekly' };
+  return null;
+}
+
+/* =====================================================================
+   6. TASK LOGIC
+   status values stored: 'completed' | 'missed'.   Derived on the fly: 'pending', 'holiday', 'na', 'future'.
+   ===================================================================== */
+function taskStatus(key, task, now) {
+  var today = dateKey(now), sec = secOfDay(now);
+  if (key > today) return 'future';
+  if (key < state.meta.startDate) return 'na';
+  if (holidayFor(key)) return 'holiday';
+  var rec = state.records[key] && state.records[key][task.id];
+  if (rec) return rec.status;
+  /* A window that had already closed before the user began tracking is not counted against them. */
+  if (key === state.meta.startDate && task.end != null && task.end < state.meta.startSec) return 'na';
+  if (key < today) return 'missed';
+  if (task.end != null && sec > task.end) return 'missed';
+  return 'pending';
+}
+
+function setRecord(key, taskId, status, completedAt) {
+  if (!state.records[key]) state.records[key] = {};
+  var r = { date: key, taskId: taskId, status: status };
+  if (completedAt) r.completedAt = completedAt;
+  state.records[key][taskId] = r;
+}
+
+/* Persist 'missed' for anything whose window has expired. full=true scans every day since tracking began
+   (used on open, on a new day, and after import) so a closed browser never hides missed days. */
+function processExpired(now, full) {
+  var today = dateKey(now), changed = false;
+  var from = full ? state.meta.startDate : today;
+  eachDay(from, today, function (k) {
+    if (holidayFor(k)) return;
+    TASKS.forEach(function (t) {
+      if (state.records[k] && state.records[k][t.id]) return;
+      if (taskStatus(k, t, now) === 'missed') { setRecord(k, t.id, 'missed'); changed = true; }
+    });
+  });
+  if (state.meta.lastProcessed !== today) { state.meta.lastProcessed = today; changed = true; }
+  if (changed) save();
+  return changed;
+}
+
+/* The ONLY way a task becomes completed. Time is validated here, using a fresh clock reading,
+   never from anything the UI displays. */
+function attemptComplete(taskId) {
+  var task = TASK_BY_ID[taskId];
+  if (!task) return { ok: false, code: 'unknown', message: 'Unknown task.' };
+  var now = new Date(), key = dateKey(now), sec = secOfDay(now);
+  if (holidayFor(key)) return { ok: false, code: 'holiday', message: 'Today is a rest day. Nothing is required.' };
+  var st = taskStatus(key, task, now);
+  if (st === 'completed') return { ok: true, code: 'already' };
+  if (st === 'na') return { ok: false, code: 'na', message: 'This task is not tracked for today.' };
+  if (task.start != null) {
+    if (sec < task.start) return { ok: false, code: 'early', message: earlyMsg(task) };
+    if (sec > task.end) {
+      if (!(state.records[key] && state.records[key][task.id])) { setRecord(key, task.id, 'missed'); save(); }
+      return { ok: false, code: 'missed', message: missMsg(task) };
+    }
+  }
+  if (st === 'missed') return { ok: false, code: 'missed', message: missMsg(task) };   // MISSED can never flip back
+  setRecord(key, task.id, 'completed', hhmm(now));
+  save();
+  return { ok: true, code: 'done' };
+}
+
+/* Undo is only allowed while the task could still be completed legitimately. */
+function undoComplete(taskId) {
+  var task = TASK_BY_ID[taskId], now = new Date(), key = dateKey(now);
+  var rec = state.records[key] && state.records[key][taskId];
+  if (!task || !rec || rec.status !== 'completed') return { ok: false, message: 'Nothing to undo.' };
+  if (task.end != null && secOfDay(now) > task.end) return { ok: false, message: 'The time window has closed, so this completion is locked.' };
+  delete state.records[key][taskId];
+  save();
+  return { ok: true };
+}
+
+function earlyMsg(t) { return 'Not available yet.\n' + t.noun + ' starts at ' + fmtSec(t.start, false) + '.'; }
+function missMsg(t) {
+  var a = fmtSec(t.start, false), b = fmtSec(t.end, false);
+  if (t.missStyle === 'wake') return 'Time window missed.\nWake-up tracking was available only from ' + a + ' to ' + b + '.';
+  return '❌ TIME WINDOW MISSED\n\n' + t.noun + ' must be completed\nbetween ' + a + ' and ' + b + '.';
+}
+
+/* Everything the UI needs to know about one calendar day. */
+function dayInfo(key, now) {
+  var today = dateKey(now);
+  if (key > today) return { key: key, state: 'future', tasks: [] };
+  if (key < state.meta.startDate) return { key: key, state: 'na', tasks: [] };
+  var h = holidayFor(key);
+  if (h) return { key: key, state: 'holiday', holiday: h, tasks: [] };
+  var list = TASKS.map(function (t) { return { task: t, status: taskStatus(key, t, now), rec: state.records[key] && state.records[key][t.id] }; })
+                  .filter(function (x) { return x.status !== 'na'; });
+  var c = 0, m = 0, p = 0;
+  list.forEach(function (x) { if (x.status === 'completed') c++; else if (x.status === 'missed') m++; else p++; });
+  var total = list.length;
+  if (!total) return { key: key, state: 'na', tasks: [] };
+  var percent = Math.round(c / total * 100), resolved = p === 0, st;
+  if (resolved) st = c === total ? 'completed' : (c === 0 ? 'missed' : 'partial');
+  else st = (c > 0 || m > 0) ? 'partial' : 'pending';
+  return { key: key, state: st, tasks: list, completed: c, missed: m, pending: p, total: total, percent: percent,
+           resolved: resolved, success: percent >= state.settings.streakThreshold };
+}
+
+/* ---- streaks & statistics ---- */
+function computeStreaks(from, to, judge) {
+  var run = 0, longest = 0;
+  eachDay(from, to, function (k) {
+    var r = judge(k);
+    if (r === 'win') { run++; if (run > longest) longest = run; } else if (r === 'lose') run = 0;
+  });
+  return { current: run, longest: longest };
+}
+function overallStreaks(now, from, to) {
+  var today = dateKey(now);
+  from = from && from > state.meta.startDate ? from : state.meta.startDate;
+  to = to && to < today ? to : today;
+  return computeStreaks(from, to, function (k) {
+    var i = dayInfo(k, now);
+    if (['future', 'na', 'holiday'].indexOf(i.state) >= 0) return 'skip';
+    if (i.success) return 'win';
+    if (k === today && !i.resolved) return 'skip';     // today is still in play; it can't break the streak yet
+    return 'lose';
+  });
+}
+function taskStreaks(taskId, now) {
+  var task = TASK_BY_ID[taskId], today = dateKey(now), done = 0, miss = 0;
+  var s = computeStreaks(state.meta.startDate, today, function (k) {
+    var st = taskStatus(k, task, now);
+    if (st === 'completed') { done++; return 'win'; }
+    if (st === 'missed') { miss++; return 'lose'; }
+    return 'skip';
+  });
+  return { current: s.current, longest: s.longest, done: done, miss: miss };
+}
+function rangeStats(from, to, now) {
+  var per = {}; TASKS.forEach(function (t) { per[t.id] = { c: 0, m: 0 }; });
+  var sum = 0, n = 0, perfect = 0;
+  if (from < state.meta.startDate) from = state.meta.startDate;
+  eachDay(from, to, function (k) {
+    var i = dayInfo(k, now);
+    if (['future', 'na', 'holiday'].indexOf(i.state) >= 0) return;
+    i.tasks.forEach(function (x) {
+      if (x.status === 'completed') per[x.task.id].c++; else if (x.status === 'missed') per[x.task.id].m++;
+    });
+    if (!i.resolved) return;                 // today only counts once all its windows are settled
+    sum += i.percent; n++; if (i.state === 'completed') perfect++;
+  });
+  return { avg: n ? Math.round(sum / n) : null, days: n, perfect: perfect, per: per };
+}
+
+/* =====================================================================
+   7. NOTIFICATION SYSTEM  (works while the page is open; see limitations in README text)
+   ===================================================================== */
+function notifSupported() { return 'Notification' in window; }
+function notifStatusText() {
+  if (!notifSupported()) return 'This browser does not support notifications. In-app reminders will show instead while the page is open.';
+  var p = Notification.permission;
+  if (p === 'denied') return 'Notifications are blocked for this site. Allow them in your browser\'s site settings, then press Enable again. In-app reminders still appear while the page is open.';
+  if (p === 'granted' && state.settings.notifications.enabled) return 'Notifications are on. Reminders appear while this page or app is open.';
+  if (p === 'granted') return 'Permission granted, reminders are switched off.';
+  if (!window.isSecureContext) return 'Browsers only allow notification permission on secure pages (https:// or localhost). Hosting on GitHub Pages gives you https. Until then in-app reminders will show.';
+  return 'Notifications are off. Press Enable and allow the browser prompt.';
+}
+function enableNotifications() {
+  if (!notifSupported()) { toast('This browser does not support notifications. In-app reminders will be used.', 'err'); state.settings.notifications.enabled = true; save(); return Promise.resolve(); }
+  return new Promise(function (resolve) {
+    var done = function (p) {
+      if (p === 'granted') { state.settings.notifications.enabled = true; save(); toast('Notifications enabled.', 'ok'); }
+      else if (p === 'denied') { state.settings.notifications.enabled = true; save(); toast('Permission was denied. In-app reminders will be used instead.', 'err', 6000); }
+      else toast('No choice was made. Press Enable again when ready.');
+      resolve();
+    };
+    try {
+      var r = Notification.requestPermission(done);
+      if (r && typeof r.then === 'function') r.then(done);
+    } catch (e) { toast('This browser blocked the permission request.', 'err'); resolve(); }
+  });
+}
+function sendReminder(title, body) {
+  if (notifSupported() && Notification.permission === 'granted') {
+    try { new Notification(title, { body: body, tag: title }); return; } catch (e) { /* Android Chrome needs a service worker: fall through */ }
+  }
+  toast(title + '\n' + body, 'info', 8000);
+}
+/* Fires at most once per reminder per day; a 10-minute grace period covers a tab that was asleep. */
+function checkReminders(now) {
+  var cfg = state.settings.notifications;
+  if (!cfg.enabled) return;
+  var key = dateKey(now), sec = secOfDay(now);
+  if (holidayFor(key)) return;
+  if (!state.meta.notified[key]) { state.meta.notified = {}; state.meta.notified[key] = []; }
+  var sent = state.meta.notified[key], changed = false;
+  TASKS.forEach(function (t) {
+    if (t.start == null || taskStatus(key, t, now) !== 'pending') return;
+    var id;
+    if (cfg.atStart && t.remind) {
+      id = t.id + ':start';
+      if (sent.indexOf(id) < 0 && sec >= t.start && sec < t.start + 600) { sent.push(id); changed = true; sendReminder(t.remind.title, t.remind.body); }
+    }
+    if (cfg.closing) {
+      var at = t.end - cfg.closingMins * 60;
+      id = t.id + ':closing';
+      if (sent.indexOf(id) < 0 && sec >= at && sec < Math.min(at + 600, t.end)) {
+        sent.push(id); changed = true;
+        sendReminder('⏳ ' + t.name + ' closes soon', 'The window closes at ' + fmtSec(t.end, false) + '. Mark it done if you have finished.');
+      }
+    }
+  });
+  if (changed) save();
+}
+
+/* =====================================================================
+   8. JOURNAL SYSTEM  (sanitizer, text conversion, CRUD)
+   ===================================================================== */
+var ALLOWED_TAGS = ['B','STRONG','I','EM','U','S','STRIKE','H1','H2','H3','P','DIV','BR','UL','OL','LI','SPAN','FONT','BLOCKQUOTE','MARK','SUB','SUP'];
+var DROP_TAGS = ['SCRIPT','STYLE','IFRAME','OBJECT','EMBED','NOSCRIPT','TEMPLATE','LINK','META','SVG','MATH'];
+var ALLOWED_STYLE = ['color','background-color','font-size','text-align','font-weight','font-style','text-decoration','text-decoration-line'];
+function cleanStyle(s) {
+  return s.split(';').map(function (p) { return p.trim(); }).filter(function (p) {
+    var i = p.indexOf(':'); if (i < 0) return false;
+    var k = p.slice(0, i).trim().toLowerCase(), v = p.slice(i + 1).trim();
+    return ALLOWED_STYLE.indexOf(k) >= 0 && /^[#a-z0-9(),.\s%-]+$/i.test(v) && !/url|expression|javascript/i.test(v);
+  }).join(';');
+}
+/* Whitelist sanitizer: protects against script injection from imported backups. */
+function sanitizeHtml(html) {
+  var out = document.createElement('div');
+  try {
+    var doc = new DOMParser().parseFromString('<body>' + html + '</body>', 'text/html');
+    (function walk(src, dst) {
+      Array.prototype.forEach.call(src.childNodes, function (n) {
+        if (n.nodeType === 3) { dst.appendChild(document.createTextNode(n.nodeValue)); return; }
+        if (n.nodeType !== 1) return;
+        if (DROP_TAGS.indexOf(n.tagName.toUpperCase()) >= 0) return;
+        if (ALLOWED_TAGS.indexOf(n.tagName) < 0) { walk(n, dst); return; }
+        var el = document.createElement(n.tagName.toLowerCase());
+        if (n.hasAttribute('style')) { var st = cleanStyle(n.getAttribute('style')); if (st) el.setAttribute('style', st); }
+        if (n.tagName === 'FONT') ['size', 'color'].forEach(function (a) {
+          if (n.hasAttribute(a) && /^[#a-z0-9]+$/i.test(n.getAttribute(a))) el.setAttribute(a, n.getAttribute(a));
+        });
+        walk(n, el); dst.appendChild(el);
+      });
+    })(doc.body, out);
+  } catch (e) { out.textContent = String(html).replace(/<[^>]*>/g, ''); }
+  return out.innerHTML;
+}
+function htmlToText(html) {
+  var d = document.createElement('div'); d.innerHTML = sanitizeHtml(html);
+  var out = '', BLOCK = ['P','DIV','H1','H2','H3','UL','OL','LI','BLOCKQUOTE'];
+  function walk(n) {
+    if (n.nodeType === 3) { out += n.nodeValue; return; }
+    if (n.nodeType !== 1) return;
+    var t = n.tagName;
+    if (t === 'BR') { out += '\n'; return; }
+    var block = BLOCK.indexOf(t) >= 0;
+    if (block && out && !/\n$/.test(out)) out += '\n';
+    if (t === 'LI') {
+      var p = n.parentNode;
+      out += (p && p.tagName === 'OL') ? (Array.prototype.indexOf.call(p.children, n) + 1) + '. ' : '• ';
+    }
+    Array.prototype.forEach.call(n.childNodes, walk);
+    if (block && !/\n$/.test(out)) out += '\n';
+    if (/^H[1-3]$/.test(t)) out += '\n';
+  }
+  Array.prototype.forEach.call(d.childNodes, walk);
+  return out.replace(/\n{3,}/g, '\n\n').trim();
+}
+function noteToText(n) {
+  return (n.title || 'Untitled') + '\n' + 'Date: ' + longDate(n.date) + '\n' + '------------------------------\n' + htmlToText(n.html) + '\n';
+}
+function download(filename, text, mime) {
+  try {
+    var blob = new Blob([text], { type: (mime || 'text/plain') + ';charset=utf-8' });
+    var url = URL.createObjectURL(blob), a = document.createElement('a');
+    a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1500);
+    return true;
+  } catch (e) { toast('Your browser blocked the download.', 'err'); return false; }
+}
+
+var J = { activeId: null, dirty: false, timer: null, range: null, search: '' };
+function noteById(id) { return state.notes.filter(function (n) { return n.id === id; })[0]; }
+
+function readEditor() {
+  var body = $('#noteBody'); if (!body) return null;
+  return { title: $('#noteTitle').value.trim(), date: validKey($('#noteDate').value) ? $('#noteDate').value : dateKey(new Date()),
+           html: sanitizeHtml(body.innerHTML), text: body.textContent.trim(), hasMedia: !!body.querySelector('li') };
+}
+/* returns true if something was written */
+function saveCurrentNote(manual) {
+  var e = readEditor(); if (!e) return false;
+  if (!e.title && !e.text && !e.hasMedia) {
+    if (manual) toast('Write a title or some text first.');
+    return false;
+  }
+  var nowIso = new Date().toISOString(), n = J.activeId ? noteById(J.activeId) : null;
+  if (!n) { n = { id: uid(), created: nowIso }; state.notes.push(n); J.activeId = n.id; }
+  n.title = e.title; n.date = e.date; n.html = e.html; n.updated = nowIso;
+  var ok = save(); J.dirty = false;
+  setSaveState(ok ? 'Saved at ' + fmtSec(secOfDay(new Date())) : 'Could not save (storage problem).');
+  renderNoteList();
+  if (manual && ok) toast('Note saved.', 'ok');
+  return true;
+}
+function flushJournal() { if (J.dirty && $('#noteBody')) saveCurrentNote(false); }
+function setSaveState(t) { var el = $('#noteStatus'); if (el) el.textContent = t; }
+function markDirty() {
+  J.dirty = true; setSaveState('Unsaved changes…');
+  updateEmptyFlag();
+  clearTimeout(J.timer);
+  if (state.settings.journal.autosave) J.timer = setTimeout(function () { saveCurrentNote(false); }, 1500);
+}
+function updateEmptyFlag() {
+  var b = $('#noteBody'); if (!b) return;
+  b.setAttribute('data-empty', (!b.textContent.trim() && !b.querySelector('li')) ? 'true' : 'false');
+}
+function loadNote(id) {
+  flushJournal();
+  var n = id ? noteById(id) : null;
+  J.activeId = n ? n.id : null; J.dirty = false;
+  $('#noteTitle').value = n ? n.title : '';
+  $('#noteDate').value = n ? n.date : dateKey(new Date());
+  $('#noteBody').innerHTML = n ? sanitizeHtml(n.html) : '';
+  updateEmptyFlag();
+  setSaveState(n ? 'Last saved ' + new Date(n.updated).toLocaleString() : 'New note. Not saved yet.');
+  renderNoteList();
+}
+function renderNoteList() {
+  var el = $('#noteList'); if (!el) return;
+  var q = J.search.trim().toLowerCase();
+  var list = state.notes.slice().sort(function (a, b) { return b.updated.localeCompare(a.updated); })
+    .filter(function (n) { return !q || n.title.toLowerCase().indexOf(q) >= 0 || htmlToText(n.html).toLowerCase().indexOf(q) >= 0 || longDate(n.date).toLowerCase().indexOf(q) >= 0; });
+  $('#noteCount').textContent = state.notes.length + (state.notes.length === 1 ? ' note' : ' notes');
+  if (!list.length) {
+    el.innerHTML = '<p class="muted small">' + (q ? 'No notes match "' + esc(J.search) + '".' : 'No saved notes yet. Write your first one on the right.') + '</p>';
+    return;
+  }
+  el.innerHTML = list.map(function (n) {
+    var prev = htmlToText(n.html).replace(/\s+/g, ' ').slice(0, 70);
+    return '<button type="button" class="note-item' + (n.id === J.activeId ? ' active' : '') + '" data-action="noteSelect" data-id="' + esc(n.id) + '">' +
+      '<b>' + esc(n.title || 'Untitled') + '</b><small>' + esc(longDate(n.date)) + (prev ? ' · ' + esc(prev) : '') + '</small></button>';
+  }).join('');
+}
+
+/* =====================================================================
+   9. UI STATE, TOASTS, MODALS
+   ===================================================================== */
+var ui = { view: 'dashboard', calYear: new Date().getFullYear(), holYear: new Date().getFullYear(), msgs: {}, lastSig: '' };
+
+function toast(msg, type, ms) {
+  var box = $('#toasts'); if (!box) return;
+  while (box.children.length >= 3) box.removeChild(box.firstChild);
+  var el = document.createElement('div');
+  el.className = 'toast ' + (type || ''); el.textContent = msg; box.appendChild(el);
+  setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, ms || 4200);
+}
+
+/* Generic accessible modal. Resolves with the chosen action's `value` (or null on Esc/backdrop). */
+function openModal(o) {
+  return new Promise(function (resolve) {
+    var prev = document.activeElement;
+    var bd = document.createElement('div'); bd.className = 'backdrop';
+    bd.innerHTML = '<div class="modal ' + (o.danger ? 'danger' : '') + '" role="dialog" aria-modal="true" aria-labelledby="mTitle">' +
+      '<h2 id="mTitle">' + o.title + '</h2><div>' + (o.html || '') + '</div>' +
+      (o.input ? '<label class="m-input">Type <b>' + esc(o.input.match) + '</b> to confirm<input type="text" id="mInput" autocomplete="off" autocapitalize="characters" spellcheck="false"></label>' : '') +
+      '<div class="m-actions">' + o.actions.map(function (a, i) {
+        return '<button type="button" class="btn ' + (a.cls || '') + '" data-i="' + i + '"' + (a.needsInput ? ' disabled' : '') + '>' + a.label + '</button>';
+      }).join('') + '</div></div>';
+    document.body.appendChild(bd); document.body.classList.add('modal-open');
+    var modal = $('.modal', bd);
+    function close(v) {
+      document.removeEventListener('keydown', onKey, true);
+      bd.remove(); if (!$('.backdrop')) document.body.classList.remove('modal-open');
+      if (prev && prev.focus) { try { prev.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+      resolve(v);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') { e.stopPropagation(); close(null); }
+      else if (e.key === 'Tab') {
+        var f = $$('button:not([disabled]),input,select,a[href]', modal); if (!f.length) return;
+        var first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
+    }
+    document.addEventListener('keydown', onKey, true);
+    bd.addEventListener('mousedown', function (e) { if (e.target === bd) close(null); });
+    $$('.m-actions .btn', modal).forEach(function (b) {
+      b.addEventListener('click', function () { var a = o.actions[+b.dataset.i]; close(a.value); });
+    });
+    if (o.input) {
+      var inp = $('#mInput', modal);
+      inp.addEventListener('input', function () {
+        var ok = inp.value.trim().toUpperCase() === o.input.match;
+        $$('.m-actions .btn', modal).forEach(function (b) { if (o.actions[+b.dataset.i].needsInput) b.disabled = !ok; });
+      });
+      inp.focus();
+    } else {
+      var firstBtn = $('.m-actions .btn', modal); if (firstBtn) firstBtn.focus();
+    }
+  });
+}
+
+/* =====================================================================
+   10. UI RENDERING
+   ===================================================================== */
+function motivationFor(key) { return QUOTES[(dayOfYear(parseKey(key)) - 1 + 25 * 40) % QUOTES.length]; }
+function pctBar(p) { return '<div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + p + '"><i style="width:' + p + '%"></i></div>'; }
+function blocksHTML(p) {
+  var on = Math.round(p / 5), h = '<div class="blocks" role="progressbar" aria-label="Today\'s progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="' + p + '">';
+  for (var i = 0; i < 20; i++) h += '<i class="' + (i < on ? 'on' : '') + '"></i>';
+  return h + '</div>';
+}
+function badgeHTML(st) {
+  var L = { completed: '✓ COMPLETED', pending: '○ PENDING', missed: '✕ MISSED', holiday: 'HOLIDAY', na: '— N/A' };
+  return '<span class="badge ' + st + '">' + L[st] + '</span>';
+}
+function winText(t) { return t.start == null ? 'All day · tick it yourself' : fmtSec(t.start) + ' → ' + fmtSec(t.end); }
+
+function taskCardHTML(task, now) {
+  var key = dateKey(now), sec = secOfDay(now);
+  var st = taskStatus(key, task, now);
+  var rec = state.records[key] && state.records[key][task.id];
+  var windowed = task.start != null, msg = ui.msgs[task.id];
+  var upcoming = st === 'pending' && windowed && sec < task.start;
+  var ctl = '', extra = '';
+
+  if (st === 'holiday') ctl = '<p class="hint">Rest day. Nothing is required today.</p>';
+  else if (st === 'na') ctl = '<p class="hint">This window had already closed when you started tracking.</p>';
+  else if (task.kind === 'button') {
+    if (st === 'completed') {
+      ctl = '<p class="stamp"><b>Status:</b> Completed at ' + fmtHHMM(rec && rec.completedAt) + '</p>';
+      if (sec <= task.end) ctl += '<button type="button" class="linkbtn" data-action="undo" data-task="' + task.id + '">Undo</button>';
+    } else if (st === 'pending') {
+      ctl = '<button type="button" class="btn woke" data-action="complete" data-task="' + task.id + '" data-fk="c-' + task.id + '"' + (upcoming ? ' aria-disabled="true"' : '') + '>✓ I WOKE UP</button>';
+    }
+  } else {
+    var locked = st === 'missed' || (st === 'completed' && windowed && sec > task.end) || upcoming;
+    ctl = '<label class="check"><input type="checkbox" data-action="toggle" data-task="' + task.id + '" data-fk="c-' + task.id + '"' +
+      (st === 'completed' ? ' checked' : '') + (locked ? ' aria-disabled="true"' : '') + '><span class="bx" aria-hidden="true"></span>' +
+      '<span>' + (task.id === 'selfControl' ? 'Completed Today' : 'Completed') + '</span></label>';
+    if (st === 'completed' && rec && rec.completedAt) ctl += '<p class="stamp">Completed at ' + fmtHHMM(rec.completedAt) + '</p>';
+  }
+  if (st === 'missed' && windowed) extra += '<p class="alert" role="alert">' + esc(missMsg(task)) + '</p>';
+  else if (st === 'missed') extra += '<p class="alert" role="alert">Missed. This day ended without being completed.</p>';
+  else if (msg) extra += '<p class="alert warn" role="alert">' + esc(msg) + '</p>';
+  if (st === 'pending' && windowed) extra += '<p class="hint" data-count="' + task.id + '"></p>';
+
+  if (task.id === 'selfControl') {
+    var s = taskStreaks(task.id, now), tracked = s.done + s.miss;
+    extra += pctBar(tracked ? Math.round(s.done / tracked * 100) : 0) +
+      '<div class="mini-stats"><div><b>' + s.current + '</b><span>Current streak</span></div><div><b>' + s.longest + '</b><span>Longest streak</span></div>' +
+      '<div><b>' + s.done + '</b><span>Total completed</span></div><div><b>' + s.miss + '</b><span>Missed days</span></div></div>' +
+      '<div class="dots" aria-label="Last 14 days">' + lastDots(task, now, 14) + '</div>';
+  }
+  return '<article class="card task ' + st + '" style="--tab:' + task.color + '"><div class="task-h"><div><h3><span aria-hidden="true">' + task.icon + '</span> ' + esc(task.name) + '</h3>' +
+    (task.tagline ? '<div class="tag">' + esc(task.tagline) + '</div>' : '') + '</div>' + badgeHTML(st) + '</div>' +
+    '<p class="win">' + (windowed ? 'Target time · ' : '') + winText(task) + '</p>' + ctl + extra + '</article>';
+}
+function lastDots(task, now, n) {
+  var h = '', today = dateKey(now);
+  for (var i = n - 1; i >= 0; i--) {
+    var k = addDays(today, -i), st = taskStatus(k, task, now);
+    var cls = ['completed', 'missed', 'holiday'].indexOf(st) >= 0 ? st : '';
+    h += '<i class="' + cls + '" title="' + esc(longDate(k) + ': ' + st) + '"></i>';
+  }
+  return h;
+}
+
+function timelineHTML(now) {
+  var sec = secOfDay(now), key = dateKey(now);
+  var times = [];
+  TASKS.forEach(function (t) { if (t.start != null) [t.start, t.end].forEach(function (x) { if (times.indexOf(x) < 0) times.push(x); }); });
+  times.sort(function (a, b) { return a - b; });
+  var h = '<ol class="timeline"><li><span class="tl-time">All day</span><div class="tl-item">🧠 No M....N Days <small>tick it before midnight</small></div></li>';
+  times.forEach(function (tm) {
+    var starts = TASKS.filter(function (t) { return t.start === tm; });
+    var ends = TASKS.filter(function (t) { return t.end === tm; });
+    var active = starts.some(function (t) { return sec >= t.start && sec <= t.end; });
+    h += '<li class="' + (active ? 'now' : '') + '"><span class="tl-time">' + fmtSec(tm) + '</span>';
+    starts.forEach(function (t) {
+      var on = sec >= t.start && sec <= t.end;
+      var st = taskStatus(key, t, now);
+      h += '<div class="tl-item' + (on ? ' active' : '') + '"' + (on ? ' aria-current="true"' : '') + '><span aria-hidden="true">' + t.icon + '</span> ' + esc(t.name) +
+           ' <small>' + (on ? 'open now · ' : '') + st + '</small></div>';
+    });
+    if (ends.length) h += '<div class="tl-end">' + ends.map(function (t) { return esc(t.name) + ' closes'; }).join(' · ') + '</div>';
+    h += '</li>';
+  });
+  return h + '</ol>';
+}
+
+function viewDashboard() {
+  var now = new Date(), key = dateKey(now), info = dayInfo(key, now), hol = holidayFor(key);
+  var st = overallStreaks(now);
+  var all = rangeStats(state.meta.startDate, key, now);
+  var yr = rangeStats(key.slice(0, 4) + '-01-01', key, now);
+  var right;
+  if (info.state === 'holiday') {
+    right = '<div><h2 class="mini-h">Today is a holiday</h2><p class="bigpct hand">' + esc(hol.name) + '</p><p class="muted">Rest day. Nothing is required, and it will not affect your streak or averages.</p></div>';
+  } else {
+    var p = info.total ? info.percent : 0, c = info.completed || 0, m = info.missed || 0, pe = info.pending || 0;
+    right = '<div><h2 class="mini-h">Today\'s progress</h2>' + blocksHTML(p) + '<div class="bigpct">' + p + '%</div>' +
+      '<p>Completed: <b>' + c + ' / ' + (info.total || 0) + '</b></p>' +
+      '<div class="counts"><span class="ok">✓ Completed: ' + c + '</span><span class="no">✕ Missed: ' + m + '</span><span class="pe">○ Pending: ' + pe + '</span></div></div>';
+  }
+  var cards = TASKS.map(function (t) { return taskCardHTML(t, now); }).join('');
+  var el = yearElapsed(now);
+  return '<div class="stack">' +
+    '<section class="card page hero" aria-labelledby="heroTitle"><div><h1 class="hand-title" id="heroTitle"><span class="hl">MY SELF IMPROVEMENT DASHBOARD</span></h1>' +
+    '<p class="weekday">' + WEEKDAYS[now.getDay()] + '</p><p class="datelong">' + longDate(key) + '</p><p class="clock" id="clockTime">' + fmtClock(now) + '</p></div>' + right + '</section>' +
+    '<section class="stats" aria-label="Summary">' +
+      '<div class="card stat"><b>🔥 ' + st.current + (st.current === 1 ? ' Day' : ' Days') + '</b><span>Current streak</span></div>' +
+      '<div class="card stat"><b>🏆 ' + st.longest + (st.longest === 1 ? ' Day' : ' Days') + '</b><span>Longest streak</span></div>' +
+      '<div class="card stat"><b>' + (all.avg == null ? '—' : all.avg + '%') + '</b><span>Overall completion</span></div>' +
+      '<div class="card stat"><b>' + (yr.avg == null ? '—' : yr.avg + '%') + '</b><span>' + now.getFullYear() + ' average completion</span></div>' +
+      '<div class="card stat"><b id="yearPct">' + Math.round(el) + '%</b><span>of ' + now.getFullYear() + ' has passed</span><div class="bar"><i id="yearBar" style="width:' + el + '%"></i></div></div>' +
+    '</section>' +
+    '<div class="dash-cols"><section aria-label="Today\'s tasks"><h2 class="sec-h">Today\'s pages</h2><div class="grid">' + cards + '</div></section>' +
+    '<aside class="stack"><div class="sticky"><q>' + esc(motivationFor(key)) + '</q><small>— Today\'s Focus</small></div>' +
+    '<section class="card"><h2 class="sec-h">Daily timeline</h2>' + timelineHTML(now) + '</section></aside></div></div>';
+}
+
+/* ---------------- calendar ---------------- */
+var SYM = { completed: '✓', missed: '✕', partial: '○', pending: '○', holiday: 'H', future: '—', na: '—' };
+function viewCalendar() {
+  var now = new Date(), cy = now.getFullYear(), y = ui.calYear;
+  var minY = parseInt(state.meta.startDate.slice(0, 4), 10);
+  ui.calYear = y = clamp(y, Math.min(minY, cy), cy);
+  var st = rangeStats(y + '-01-01', y + '-12-31', now);
+  var months = '';
+  for (var m = 0; m < 12; m++) {
+    var first = new Date(y, m, 1).getDay(), dim = new Date(y, m + 1, 0).getDate();
+    var cells = '';
+    for (var b = 0; b < first; b++) cells += '<span class="day blank"></span>';
+    for (var d = 1; d <= dim; d++) {
+      var k = y + '-' + pad(m + 1) + '-' + pad(d), i = dayInfo(k, now);
+      var label = longDate(k) + ': ' + (i.state === 'holiday' ? 'holiday, ' + i.holiday.name : i.state === 'future' ? 'upcoming' : i.state === 'na' ? 'not tracked' : i.state + ', ' + i.percent + ' percent');
+      cells += '<button type="button" class="day" data-action="dayDetail" data-date="' + k + '" data-s="' + i.state + '"' + (k === dateKey(now) ? ' data-today="1"' : '') +
+        ' aria-label="' + esc(label) + '" title="' + esc(label) + '"><span>' + d + '</span><span class="ds" aria-hidden="true">' + SYM[i.state] + '</span></button>';
+    }
+    months += '<section class="card month" id="m' + m + '" aria-label="' + MONTHS[m] + ' ' + y + '"><h3>' + MONTHS[m] + '</h3><div class="wk" aria-hidden="true">' +
+      ['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(function (x) { return '<span>' + x + '</span>'; }).join('') + '</div><div class="days">' + cells + '</div></section>';
+  }
+  return '<div class="stack"><section class="card page"><div class="cal-bar"><div><h1 class="page-h">My Calendar</h1><p class="muted">Tap any date for the full breakdown.</p></div>' +
+    '<div class="btn-row" role="group" aria-label="Choose year"><button type="button" class="btn sm" data-action="calPrev"' + (y <= Math.min(minY, cy) ? ' disabled' : '') + ' aria-label="Previous year">‹</button>' +
+    '<span class="cal-year" aria-live="polite">' + y + '</span><button type="button" class="btn sm" data-action="calNext"' + (y >= cy ? ' disabled' : '') + ' aria-label="Next year">›</button>' +
+    (y !== cy ? '<button type="button" class="btn sm" data-action="calToday">This year</button>' : '') + '</div></div>' +
+    '<p class="small muted" style="margin-top:8px">' + (st.avg == null ? 'No completed days recorded for ' + y + ' yet.' : y + ' average: <b>' + st.avg + '%</b> across ' + st.days + ' tracked days · ' + st.perfect + ' perfect days') + '</p>' +
+    '<div class="legend"><span><i class="lg-completed">✓</i> Completed</span><span><i class="lg-missed">✕</i> Missed</span><span><i class="lg-partial">○</i> Partial</span><span><i class="lg-holiday">H</i> Holiday</span><span><i class="lg-future">—</i> Future / not tracked</span></div></section>' +
+    '<div class="months">' + months + '</div></div>';
+}
+function showDayDetail(k) {
+  var now = new Date(), i = dayInfo(k, now), wd = WEEKDAYS[parseKey(k).getDay()], body = '';
+  if (i.state === 'holiday') body = '<p><b>HOLIDAY</b>: ' + esc(i.holiday.name) + '</p><p class="muted small">Rest day. It does not affect your streak or averages.</p>';
+  else if (i.state === 'future') body = '<p class="muted">Upcoming day. Nothing is recorded yet.</p>';
+  else if (i.state === 'na') body = '<p class="muted">This day is not tracked (it is before you started, or no task applied).</p>';
+  else {
+    body = i.tasks.map(function (x) {
+      var sym = x.status === 'completed' ? '✓' : x.status === 'missed' ? '✕' : '○';
+      return '<div class="d-row"><span>' + x.task.icon + ' ' + esc(x.task.name) + '</span><span><b>' + sym + '</b> <small class="muted">' +
+        (x.status === 'completed' && x.rec && x.rec.completedAt ? fmtHHMM(x.rec.completedAt) : x.status.toUpperCase()) + '</small></span></div>';
+    }).join('') + '<p style="margin-top:12px"><b>Daily Progress: ' + i.percent + '%</b></p>' + pctBar(i.percent) +
+      '<p class="small muted" style="margin-top:6px">✓ ' + i.completed + ' · ✕ ' + i.missed + ' · ○ ' + i.pending + '</p>';
+  }
+  openModal({ title: esc(longDate(k)) + '<div class="small muted" style="font-family:var(--sans);font-weight:400">' + wd + '</div>', html: body, actions: [{ label: 'Close', cls: 'primary', value: true }] });
+}
+
+/* ---------------- progress ---------------- */
+function barChartSVG(items, labelEvery, ariaLabel) {
+  var step = items.length > 12 ? 30 : 34, W = items.length * step, Hh = 160, pt = 8, pb = 24, bw = 18;
+  var s = '<svg class="chart" viewBox="0 0 ' + W + ' ' + Hh + '" role="img" aria-label="' + esc(ariaLabel) + '">';
+  [0, 50, 100].forEach(function (g) { var y = Hh - pb - (Hh - pt - pb) * g / 100; s += '<line class="c-grid" x1="0" x2="' + W + '" y1="' + y + '" y2="' + y + '"/>'; });
+  items.forEach(function (it, i) {
+    var x = i * step + step / 2;
+    if (it.value == null) s += '<circle class="c-na" cx="' + x + '" cy="' + (Hh - pb - 3) + '" r="2"><title>' + esc(it.title) + '</title></circle>';
+    else { var h = Math.max(2, (Hh - pt - pb) * it.value / 100); s += '<rect class="' + (it.today ? 'c-today' : 'c-bar') + '" x="' + (x - bw / 2) + '" y="' + (Hh - pb - h) + '" width="' + bw + '" height="' + h + '" rx="3"><title>' + esc(it.title) + '</title></rect>'; }
+    if (i % labelEvery === 0) s += '<text x="' + x + '" y="' + (Hh - 7) + '">' + esc(it.label) + '</text>';
+  });
+  return s + '</svg>';
+}
+function viewProgress() {
+  var now = new Date(), key = dateKey(now), y = now.getFullYear();
+  var info = dayInfo(key, now);
+  var dow = (now.getDay() + 6) % 7, weekFrom = addDays(key, -dow), monthFrom = key.slice(0, 7) + '-01';
+  var wk = rangeStats(weekFrom, key, now), mo = rangeStats(monthFrom, key, now), yr = rangeStats(y + '-01-01', key, now);
+  var fmt = function (v) { return v == null ? '—' : v + '%'; };
+  var todayTxt = info.state === 'holiday' ? 'Holiday' : (info.total ? info.percent + '%' : '—');
+
+  var last14 = [];
+  for (var i = 13; i >= 0; i--) {
+    var k = addDays(key, -i), di = dayInfo(k, now);
+    var has = ['future', 'na', 'holiday'].indexOf(di.state) < 0;
+    last14.push({ label: String(parseKey(k).getDate()), value: has ? di.percent : null, today: k === key, title: longDate(k) + ': ' + (has ? di.percent + '%' : di.state === 'holiday' ? 'holiday' : 'not tracked') });
+  }
+  var monthly = MONTHS.map(function (mn, mi) {
+    var s = rangeStats(y + '-' + pad(mi + 1) + '-01', y + '-' + pad(mi + 1) + '-31', now);
+    return { label: mn.slice(0, 3), value: s.avg, title: mn + ': ' + (s.avg == null ? 'no data' : s.avg + '%') };
+  });
+  var rates = TASKS.map(function (t) {
+    var r = yr.per[t.id], tot = r.c + r.m, p = tot ? Math.round(r.c / tot * 100) : 0;
+    return '<div class="rate"><div class="rate-h"><span>' + t.icon + ' ' + esc(t.name.toUpperCase()) + '</span><span>' + (tot ? 'Completion Rate: ' + p + '%' : 'No data yet') + '</span></div>' + pctBar(p) +
+      '<span class="small muted">' + r.c + ' completed · ' + r.m + ' missed</span></div>';
+  }).join('');
+
+  var minY = parseInt(state.meta.startDate.slice(0, 4), 10), yrs = '';
+  for (var yy = y; yy >= minY; yy--) {
+    var s = rangeStats(yy + '-01-01', yy + '-12-31', now), ls = overallStreaks(now, yy + '-01-01', yy + '-12-31');
+    yrs += '<div class="card year-card"><div><h3 class="hand" style="font-size:1.6rem">' + yy + (yy === y ? ' <span class="small muted">(current)</span>' : '') + '</h3>' +
+      '<p class="small muted">' + (s.avg == null ? 'No settled days yet' : 'Average ' + s.avg + '% · ' + s.perfect + ' perfect days · best streak ' + ls.longest) + '</p></div>' +
+      '<button type="button" class="btn sm" data-action="openYear" data-year="' + yy + '">Open calendar</button></div>';
+  }
+  return '<div class="stack"><section><h1 class="page-h">MY PROGRESS</h1><p class="muted small">Averages count settled days only. Today joins once every window has closed or been completed. Holidays are left out.</p></section>' +
+    '<section class="sum-grid" aria-label="Averages"><div class="card"><b>' + todayTxt + '</b><span class="muted">Today\'s Progress</span></div><div class="card"><b>' + fmt(wk.avg) + '</b><span class="muted">Weekly Average</span></div>' +
+    '<div class="card"><b>' + fmt(mo.avg) + '</b><span class="muted">Monthly Average</span></div><div class="card"><b>' + fmt(yr.avg) + '</b><span class="muted">Year Progress (' + y + ')</span></div></section>' +
+    '<section class="card"><h2 class="sec-h">Last 14 days</h2>' + barChartSVG(last14, 1, 'Daily completion percentage for the last 14 days') + '</section>' +
+    '<section class="card"><h2 class="sec-h">Task completion rates in ' + y + '</h2>' + rates + '</section>' +
+    '<section class="card"><h2 class="sec-h">Monthly average in ' + y + '</h2>' + barChartSVG(monthly, 1, 'Average completion by month') + '</section>' +
+    '<section><h2 class="sec-h">Year history</h2><div class="stack" style="gap:12px">' + yrs + '</div><p class="small muted" style="margin-top:8px">Previous years are never deleted. A new year starts automatically on 1 January.</p></section></div>';
+}
+
+/* ---------------- journal ---------------- */
+var SWATCH_TEXT = ['#1f2b45', '#c23b36', '#d9772b', '#2f8f5b', '#2c5aa0', '#7a4fb5'];
+var SWATCH_HL = ['#fff1a0', '#ffd6dc', '#cdeed8', '#cfe3fb', '#e6d9f7', '#ffe0b8'];
+function viewJournal() {
+  var sw = function (arr, kind, lbl) { return arr.map(function (c) { return '<button type="button" class="t-sw" data-action="swatch" data-kind="' + kind + '" data-color="' + c + '" style="background:' + c + '" aria-label="' + lbl + ' ' + c + '"></button>'; }).join(''); };
+  return '<div class="stack"><section><h1 class="page-h">MY JOURNAL</h1><p class="muted small">Notes, events, ideas, study and project notes. Saved on this device.</p></section>' +
+    '<div class="journal"><aside class="card"><div class="btn-row"><button type="button" class="btn primary" data-action="noteNew">+ NEW NOTE</button></div>' +
+    '<label class="field" style="margin-top:12px"><span class="sr">Search notes</span><input type="search" id="noteSearch" placeholder="Search notes…" aria-label="Search notes"></label>' +
+    '<p class="small muted" id="noteCount" style="margin-top:8px"></p><div class="note-list" id="noteList"></div>' +
+    '<div class="btn-row" style="margin-top:12px"><button type="button" class="btn sm ghost" data-action="noteExportAll">Download All Notes</button></div></aside>' +
+    '<section class="card page"><div class="j-meta"><label class="field">Title<input type="text" id="noteTitle" maxlength="200" placeholder="Give this note a title"></label>' +
+    '<label class="field">Date<input type="date" id="noteDate"></label></div>' +
+    '<div class="tb" role="toolbar" aria-label="Text formatting">' +
+      '<button type="button" class="t" data-cmd="bold" aria-label="Bold"><b>B</b></button><button type="button" class="t" data-cmd="italic" aria-label="Italic"><i>I</i></button><button type="button" class="t" data-cmd="underline" aria-label="Underline"><u>U</u></button>' +
+      '<select id="blockSel" aria-label="Heading"><option value="P">Paragraph</option><option value="H1">Heading 1</option><option value="H2">Heading 2</option><option value="H3">Heading 3</option></select>' +
+      '<select id="sizeSel" aria-label="Font size"><option value="2">Small</option><option value="3" selected>Normal</option><option value="4">Medium</option><option value="5">Large</option><option value="6">X-Large</option></select><span class="sep"></span>' +
+      '<button type="button" class="t" data-cmd="justifyLeft" aria-label="Align left">⇤</button><button type="button" class="t" data-cmd="justifyCenter" aria-label="Align centre">≡</button><button type="button" class="t" data-cmd="justifyRight" aria-label="Align right">⇥</button><button type="button" class="t" data-cmd="justifyFull" aria-label="Justify">☰</button><span class="sep"></span>' +
+      '<button type="button" class="t" data-cmd="insertUnorderedList" aria-label="Bullet list">• List</button><button type="button" class="t" data-cmd="insertOrderedList" aria-label="Numbered list">1. List</button><span class="sep"></span>' +
+      '<span class="sw" role="group" aria-label="Text colour"><b class="small">A</b>' + sw(SWATCH_TEXT, 'fore', 'Text colour') + '<input type="color" id="foreCustom" value="#2c5aa0" aria-label="Custom text colour"></span>' +
+      '<span class="sw" role="group" aria-label="Highlight colour"><b class="small" style="background:var(--hl);padding:0 4px">HL</b>' + sw(SWATCH_HL, 'back', 'Highlight') + '<input type="color" id="backCustom" value="#fff1a0" aria-label="Custom highlight colour"></span><span class="sep"></span>' +
+      '<button type="button" class="t" data-cmd="undo" aria-label="Undo">↶</button><button type="button" class="t" data-cmd="redo" aria-label="Redo">↷</button><button type="button" class="t" data-cmd="stamp" aria-label="Insert date and time">📅+🕒</button></div>' +
+    '<div class="editor-wrap"><div class="editor" id="noteBody" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Note text" data-placeholder="Write your thoughts here…" data-empty="true"></div></div>' +
+    '<p class="save-state" id="noteStatus" aria-live="polite"></p>' +
+    '<div class="btn-row" style="margin-top:8px"><button type="button" class="btn primary" data-action="noteSave">SAVE NOTE</button><button type="button" class="btn" data-action="noteExport">EXPORT NOTE (.txt)</button><button type="button" class="btn ghost" data-action="noteDelete">Delete</button></div></section></div></div>';
+}
+function afterJournal() {
+  var b = $('#noteBody'); if (!b) return;
+  b.style.fontSize = ({ 2: '.92rem', 3: '1.05rem', 4: '1.2rem', 5: '1.4rem' })[state.settings.journal.fontSize] || '1.05rem';
+  var n = state.notes.slice().sort(function (a, b2) { return b2.updated.localeCompare(a.updated); })[0];
+  J.search = '';
+  loadNoteInitial(J.activeId && noteById(J.activeId) ? J.activeId : (n ? n.id : null));
+  b.addEventListener('input', markDirty);
+  $('#noteTitle').addEventListener('input', markDirty);
+  $('#noteDate').addEventListener('change', markDirty);
+  $('#noteSearch').addEventListener('input', function (e) { J.search = e.target.value; renderNoteList(); });
+  b.addEventListener('paste', function (e) {   // paste as plain text: keeps notes clean and safe
+    e.preventDefault();
+    var t = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, t);
+  });
+  b.addEventListener('focus', function () { try { document.execCommand('styleWithCSS', false, true); } catch (er) { /* ignore */ } });
+  $('#blockSel').addEventListener('change', function (e) { restoreSel(); document.execCommand('formatBlock', false, '<' + e.target.value.toLowerCase() + '>'); markDirty(); });
+  $('#sizeSel').addEventListener('change', function (e) { restoreSel(); document.execCommand('fontSize', false, e.target.value); markDirty(); });
+  $('#foreCustom').addEventListener('input', function (e) { applyColor('fore', e.target.value); });
+  $('#backCustom').addEventListener('input', function (e) { applyColor('back', e.target.value); });
+}
+function loadNoteInitial(id) {
+  var n = id ? noteById(id) : null;
+  J.activeId = n ? n.id : null; J.dirty = false;
+  $('#noteTitle').value = n ? n.title : '';
+  $('#noteDate').value = n ? n.date : dateKey(new Date());
+  $('#noteBody').innerHTML = n ? sanitizeHtml(n.html) : '';
+  updateEmptyFlag();
+  setSaveState(n ? 'Last saved ' + new Date(n.updated).toLocaleString() : 'New note. Not saved yet.');
+  renderNoteList();
+}
+/* Remember the caret/selection so toolbar controls that take focus (select, colour picker) still work. */
+document.addEventListener('selectionchange', function () {
+  var b = $('#noteBody'), sel = window.getSelection();
+  if (b && sel && sel.rangeCount && b.contains(sel.anchorNode)) J.range = sel.getRangeAt(0).cloneRange();
+});
+function restoreSel() {
+  var b = $('#noteBody'); if (!b) return; b.focus();
+  if (J.range) { var s = window.getSelection(); s.removeAllRanges(); s.addRange(J.range); }
+}
+function applyColor(kind, color) {
+  restoreSel();
+  if (kind === 'fore') document.execCommand('foreColor', false, color);
+  else if (!document.execCommand('hiliteColor', false, color)) document.execCommand('backColor', false, color);
+  markDirty();
+}
+function runCmd(cmd) {
+  restoreSel();
+  if (cmd === 'stamp') { var n = new Date(); document.execCommand('insertText', false, longDate(dateKey(n)) + ', ' + fmtSec(secOfDay(n)) + ' '); }
+  else document.execCommand(cmd, false, null);
+  markDirty();
+}
+function exportAllNotes() {
+  flushJournal();
+  if (!state.notes.length) { toast('There are no saved notes to download yet.'); return; }
+  var txt = state.notes.slice().sort(function (a, b) { return a.date.localeCompare(b.date) || a.created.localeCompare(b.created); })
+    .map(noteToText).join('\n==============================\n\n');
+  if (download('Journal_All_Notes_' + dateKey(new Date()) + '.txt', txt)) toast('Downloaded ' + state.notes.length + ' notes.', 'ok');
+}
+
+/* ---------------- settings ---------------- */
+function switchRow(id, label, checked, desc) {
+  return '<label class="switch"><input type="checkbox" data-set="' + id + '"' + (checked ? ' checked' : '') + '><span class="trk" aria-hidden="true"></span><span>' + label + (desc ? '<br><span class="small muted">' + desc + '</span>' : '') + '</span></label>';
+}
+function viewSettings() {
+  var s = state.settings, n = s.notifications, cy = new Date().getFullYear();
+  var yearOpts = ''; for (var y = cy - 1; y <= cy + 2; y++) yearOpts += '<option value="' + y + '"' + (y === ui.holYear ? ' selected' : '') + '>' + y + '</option>';
+  var hl = getHolidayList(ui.holYear).slice().sort(function (a, b) { return a.date.localeCompare(b.date); });
+  var hasFull = !!BUILTIN_HOLIDAYS[ui.holYear];
+  var nowSupported = notifSupported() && Notification.permission === 'granted' && n.enabled;
+  return '<div class="stack"><h1 class="page-h">SETTINGS</h1>' +
+  '<section class="card set-sec"><h2>🔔 Notifications</h2><p class="small">' + esc(notifStatusText()) + '</p>' +
+    '<div class="btn-row"><button type="button" class="btn primary" data-action="notifEnable">' + (n.enabled ? 'Re-check permission' : 'Enable Notifications') + '</button>' +
+    (n.enabled ? '<button type="button" class="btn" data-action="notifTest">Send test</button><button type="button" class="btn ghost" data-action="notifDisable">Turn off</button>' : '') + '</div>' +
+    switchRow('notifStart', 'Remind me when a window opens', n.atStart) + switchRow('notifClosing', 'Remind me shortly before a window closes', n.closing) +
+    '<label class="field" style="max-width:260px">Closing reminder lead time<select data-set="notifMins">' + [10, 15, 30].map(function (m) { return '<option value="' + m + '"' + (m === n.closingMins ? ' selected' : '') + '>' + m + ' minutes before</option>'; }).join('') + '</select></label>' +
+    '<p class="callout warn small">Limits: a static web page cannot wake itself. Reminders fire only while this page is open (a pinned tab or an installed home-screen app works well). On iPhone, notifications need iOS 16.4+ and “Add to Home Screen”. At most one reminder per window per day.</p></section>' +
+  '<section class="card set-sec"><h2>☀ Theme</h2><div class="opt-row" role="radiogroup" aria-label="Theme">' +
+    [['light', 'Notebook (light)'], ['dark', 'Night study'], ['auto', 'Match device']].map(function (t) { return '<label><input type="radio" name="theme" data-set="theme" value="' + t[0] + '"' + (s.theme === t[0] ? ' checked' : '') + '> ' + t[1] + '</label>'; }).join('') + '</div></section>' +
+  '<section class="card set-sec"><h2>📅 Holiday Settings</h2>' +
+    switchRow('holEnabled', 'Use holidays and rest days', s.holidaysEnabled, 'Holiday days need no tasks and never touch streaks or averages.') +
+    '<div><p class="small" style="font-weight:600;margin-bottom:6px">Weekly rest days <span class="muted" style="font-weight:400">(none by default; nothing is assumed)</span></p><div class="opt-row">' +
+    WEEKDAYS.map(function (w, i) { return '<label><input type="checkbox" data-set="weeklyOff" value="' + i + '"' + (s.weeklyOff.indexOf(i) >= 0 ? ' checked' : '') + '> ' + w.slice(0, 3) + '</label>'; }).join('') + '</div></div>' +
+    '<label class="field" style="max-width:200px">Holiday list for year<select data-set="holYear">' + yearOpts + '</select></label>' +
+    (hasFull ? '<p class="small muted">Built-in: Central Government gazetted holidays for ' + ui.holYear + '. Dates marked ☾ depend on moon sighting and can move by a day. State holidays (for example Pongal or Tamil New Year) are not included: add them below.</p>' :
+      '<p class="callout warn small">No full built-in list for ' + ui.holYear + ' yet. Only fixed national dates were added. Add the festival dates for your state below.</p>') +
+    '<div class="hol-list">' + (hl.length ? hl.map(function (h) { return '<div class="hol-item"><span><b>' + esc(longDate(h.date)) + '</b> · ' + esc(h.name) + (h.moon ? ' ☾' : '') + (h.custom ? ' <small class="muted">(yours)</small>' : '') + '</span><button type="button" class="btn sm ghost" data-action="holRemove" data-date="' + h.date + '" aria-label="Remove ' + esc(h.name) + '">Remove</button></div>'; }).join('') : '<p class="muted small">No holidays listed for this year.</p>') + '</div>' +
+    '<div class="hol-add"><label class="field">Date<input type="date" id="holDate" min="' + ui.holYear + '-01-01" max="' + ui.holYear + '-12-31"></label><label class="field">Name<input type="text" id="holName" maxlength="80" placeholder="e.g. Pongal"></label><button type="button" class="btn primary" data-action="holAdd">Add holiday</button></div>' +
+    '<div class="btn-row"><button type="button" class="btn sm ghost" data-action="holRestore">Restore built-in list for ' + ui.holYear + '</button></div>' +
+    '<p class="small muted">No online holiday service is used, so the app works offline and nothing leaves your device.</p></section>' +
+  '<section class="card set-sec"><h2>📊 Progress Settings</h2><label class="field" style="max-width:340px">A day counts toward the streak when I complete at least<select data-set="threshold">' +
+    [[100, '100% of tasks (all of them)'], [80, '80% of tasks'], [60, '60% of tasks']].map(function (o) { return '<option value="' + o[0] + '"' + (s.streakThreshold === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label></section>' +
+  '<section class="card set-sec"><h2>💾 Backup &amp; Restore</h2><p class="small muted">Your data is stored in this browser only. Export a backup to keep it safe or move it to another device.</p>' +
+    '<div class="btn-row"><button type="button" class="btn primary" data-action="exportAll">Export All Data</button><button type="button" class="btn" data-action="importPick">Import Data</button><button type="button" class="btn" data-action="noteExportAll">Download Journal</button></div>' +
+    '<input type="file" id="importFile" accept="application/json,.json" hidden>' +
+    '<p class="small muted">Backup file: <code>self_improvement_backup_' + cy + '.json</code> (tasks, progress, streak data, journal, settings, holidays). ' + (Store.usable ? 'Browser storage is working.' : '⚠ Browser storage is unavailable here, so export often.') + '</p></section>' +
+  '<section class="card set-sec"><h2>📝 Journal Settings</h2>' + switchRow('autosave', 'Autosave while typing', s.journal.autosave, 'Saves 1.5 seconds after you stop typing.') +
+    '<label class="field" style="max-width:240px">Editor text size<select data-set="jfont">' + [[2, 'Small'], [3, 'Normal'], [4, 'Large'], [5, 'Extra large']].map(function (o) { return '<option value="' + o[0] + '"' + (s.journal.fontSize === o[0] ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('') + '</select></label></section>' +
+  '<details class="adv"><summary>⚠ Advanced</summary><div class="danger-zone"><p class="small">Force Reset permanently deletes every task record, streak, journal note, holiday edit and setting stored in this browser. Export a backup first if you might want anything back.</p>' +
+    '<div class="btn-row"><button type="button" class="btn danger" data-action="forceReset">⚠ Force Reset</button></div></div></details></div>';
+}
+
+/* =====================================================================
+   11. ROUTING / RENDER
+   ===================================================================== */
+var VIEWS = { dashboard: viewDashboard, calendar: viewCalendar, progress: viewProgress, journal: viewJournal, settings: viewSettings };
+function buildNav() {
+  $('#tabs').innerHTML = NAV.map(function (n) { return '<a href="#/' + n.id + '" data-nav="' + n.id + '" style="--tab:' + n.tab + '"><span aria-hidden="true">' + n.icon + '</span>' + n.label + '</a>'; }).join('');
+  $('#bottomNav').innerHTML = NAV.map(function (n) { return '<a href="#/' + n.id + '" data-nav="' + n.id + '"><span class="ic" aria-hidden="true">' + n.icon + '</span>' + n.label + '</a>'; }).join('');
+}
+function currentRoute() { var h = (location.hash || '').replace(/^#\/?/, ''); return VIEWS[h] ? h : 'dashboard'; }
+function keepFocus(fn) {
+  var a = document.activeElement, fk = a && a.dataset && a.dataset.fk;
+  fn();
+  if (fk) { var n = document.querySelector('[data-fk="' + fk + '"]'); if (n) { try { n.focus({ preventScroll: true }); } catch (e) { /* ignore */ } } }
+}
+function render(opts) {
+  var v = ui.view = currentRoute(), root = $('#view');
+  $$('[data-nav]').forEach(function (a) { if (a.dataset.nav === v) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  keepFocus(function () {
+    try { root.innerHTML = VIEWS[v](); }
+    catch (e) { reportError(e); root.innerHTML = '<div class="card"><h2 class="sec-h">This page hit a problem</h2><p>Your data is safe. <button class="linkbtn" onclick="location.reload()">Reload the page</button></p></div>'; }
+  });
+  if (v === 'journal') afterJournal();
+  if (v === 'calendar' && opts && opts.scrollMonth) { var m = $('#m' + new Date().getMonth()); if (m && ui.calYear === new Date().getFullYear()) m.scrollIntoView({ block: 'start' }); }
+  updateLive(new Date());
+}
+function refreshDash() { if (ui.view === 'dashboard') render(); else if (ui.view === 'calendar' || ui.view === 'progress') render(); }
+
+/* Cheap per-second updates that never rebuild the page. */
+function updateLive(now) {
+  var c = $('#clockTime'); if (c) c.textContent = fmtClock(now);
+  var el = yearElapsed(now), yp = $('#yearPct'), yb = $('#yearBar');
+  if (yp) yp.textContent = Math.round(el) + '%'; if (yb) yb.style.width = el + '%';
+  var sec = secOfDay(now);
+  $$('[data-count]').forEach(function (n) {
+    var t = TASK_BY_ID[n.dataset.count]; if (!t) return;
+    n.textContent = sec < t.start ? 'Opens in ' + dur(t.start - sec) : sec <= t.end ? 'Open now · closes in ' + dur(t.end - sec) : '';
+  });
+}
+
+/* =====================================================================
+   12. EVENT HANDLERS
+   ===================================================================== */
+function flash(taskId, text) {
+  ui.msgs[taskId] = text;
+  setTimeout(function () { if (ui.msgs[taskId] === text) { delete ui.msgs[taskId]; if (ui.view === 'dashboard') render(); } }, 14000);
+}
+function tryComplete(taskId) {
+  delete ui.msgs[taskId];
+  var r = attemptComplete(taskId);
+  if (!r.ok) { flash(taskId, r.message); if (r.code === 'missed') toast(r.message.replace(/\n+/g, ' '), 'err', 5000); }
+  else if (r.code === 'done') toast('Marked complete. Nice work.', 'ok', 2200);
+  ui.lastSig = sigNow(); render();
+}
+var actions = {
+  complete: function (el) { tryComplete(el.dataset.task); },
+  toggle: function (el, e) {
+    e.preventDefault();                       // state is driven by data, not by the checkbox's own toggling
+    var t = TASK_BY_ID[el.dataset.task], key = dateKey(new Date());
+    var rec = state.records[key] && state.records[key][t.id];
+    if (rec && rec.status === 'completed') {
+      var u = undoComplete(t.id);
+      if (!u.ok) flash(t.id, u.message); else delete ui.msgs[t.id];
+      ui.lastSig = sigNow(); render();
+    } else tryComplete(t.id);
+  },
+  undo: function (el) { var u = undoComplete(el.dataset.task); if (!u.ok) toast(u.message); ui.lastSig = sigNow(); render(); },
+  dayDetail: function (el) { showDayDetail(el.dataset.date); },
+  calPrev: function () { ui.calYear--; render(); }, calNext: function () { ui.calYear++; render(); },
+  calToday: function () { ui.calYear = new Date().getFullYear(); render({ scrollMonth: true }); },
+  openYear: function (el) { ui.calYear = +el.dataset.year; location.hash = '#/calendar'; },
+
+  noteNew: function () { flushJournal(); loadNote(null); $('#noteTitle').focus(); },
+  noteSave: function () { saveCurrentNote(true); },
+  noteSelect: function (el) { loadNote(el.dataset.id); if (window.innerWidth <= 900) $('#noteTitle').scrollIntoView({ block: 'start' }); },
+  noteExport: function () {
+    var e = readEditor(); if (!e || (!e.title && !e.text)) { toast('Write something first, then export.'); return; }
+    saveCurrentNote(false);
+    var n = J.activeId && noteById(J.activeId); if (!n) return;
+    if (download('Journal_' + n.date + '.txt', noteToText(n))) toast('Exported Journal_' + n.date + '.txt', 'ok');
+  },
+  noteExportAll: function () { exportAllNotes(); },
+  noteDelete: function () {
+    var n = J.activeId && noteById(J.activeId);
+    if (!n) { loadNote(null); toast('This note was never saved, so it was cleared.'); return; }
+    openModal({ title: 'Delete this note?', html: '<p>“' + esc(n.title || 'Untitled') + '” will be permanently removed from this device.</p>', danger: true,
+      actions: [{ label: 'Cancel', value: false }, { label: 'Delete note', cls: 'danger', value: true }] }).then(function (ok) {
+      if (!ok) return;
+      state.notes = state.notes.filter(function (x) { return x.id !== n.id; }); save(); J.dirty = false; J.activeId = null;
+      var next = state.notes.slice().sort(function (a, b) { return b.updated.localeCompare(a.updated); })[0];
+      loadNoteInitial(next ? next.id : null); toast('Note deleted.');
+    });
+  },
+  swatch: function (el) { applyColor(el.dataset.kind, el.dataset.color); },
+
+  notifEnable: function () { enableNotifications().then(function () { if (ui.view === 'settings') render(); }); },
+  notifDisable: function () { state.settings.notifications.enabled = false; save(); render(); toast('Reminders turned off.'); },
+  notifTest: function () { sendReminder('📓 Test reminder', 'If you can see this, reminders are working.'); },
+
+  holAdd: function () {
+    var d = $('#holDate').value, nm = $('#holName').value.trim();
+    if (!validKey(d) || d.slice(0, 4) !== String(ui.holYear)) { toast('Pick a date inside ' + ui.holYear + '.', 'err'); return; }
+    if (!nm) { toast('Give the holiday a name.', 'err'); return; }
+    var list = materializeHolidays(ui.holYear);
+    if (list.some(function (h) { return h.date === d; })) { toast('That date is already a holiday.', 'err'); return; }
+    list.push({ date: d, name: nm.slice(0, 80), custom: true }); save(); afterDataChange(); toast('Holiday added.', 'ok');
+  },
+  holRemove: function (el) {
+    var list = materializeHolidays(ui.holYear);
+    state.holidays[ui.holYear] = list.filter(function (h) { return h.date !== el.dataset.date; }); save(); afterDataChange();
+  },
+  holRestore: function () {
+    openModal({ title: 'Restore built-in list?', html: '<p>Your edits to the ' + ui.holYear + ' holiday list will be replaced by the built-in list.</p>',
+      actions: [{ label: 'Cancel', value: false }, { label: 'Restore', cls: 'primary', value: true }] }).then(function (ok) {
+      if (!ok) return; state.holidays[ui.holYear] = defaultHolidays(ui.holYear); save(); afterDataChange();
+    });
+  },
+  exportAll: function () { flushJournal(); exportAllData(); },
+  importPick: function () { var f = $('#importFile'); if (f) { f.value = ''; f.click(); } },
+  forceReset: function () { forceReset(); }
+};
+/* Settings that change which days count must re-process history and refresh everything. */
+function afterDataChange() { processExpired(new Date(), true); ui.lastSig = ''; render(); }
+
+function onSettingChange(el) {
+  var s = state.settings, k = el.dataset.set;
+  switch (k) {
+    case 'theme': s.theme = el.value; applyTheme(); break;
+    case 'holEnabled': s.holidaysEnabled = el.checked; save(); afterDataChange(); return;
+    case 'weeklyOff': s.weeklyOff = $$('input[data-set="weeklyOff"]:checked').map(function (i) { return +i.value; }); save(); afterDataChange(); return;
+    case 'holYear': ui.holYear = +el.value; render(); return;
+    case 'threshold': s.streakThreshold = +el.value; break;
+    case 'notifStart': s.notifications.atStart = el.checked; break;
+    case 'notifClosing': s.notifications.closing = el.checked; break;
+    case 'notifMins': s.notifications.closingMins = +el.value; break;
+    case 'autosave': s.journal.autosave = el.checked; break;
+    case 'jfont': s.journal.fontSize = +el.value; break;
+  }
+  save();
+}
+
+/* ---- backup / restore ---- */
+function exportAllData() {
+  var payload = { app: APP_ID, schema: SCHEMA, exportedAt: new Date().toISOString(), data: state };
+  if (download('self_improvement_backup_' + new Date().getFullYear() + '.json', JSON.stringify(payload, null, 2), 'application/json')) toast('Backup downloaded.', 'ok');
+}
+function validateBackup(obj) {
+  if (!isObj(obj) || obj.app !== APP_ID) return { ok: false, error: 'This file is not a backup from the Self Improvement Dashboard.' };
+  if (!Number.isInteger(obj.schema) || obj.schema > SCHEMA) return { ok: false, error: 'This backup was made by a newer version of the dashboard and cannot be read here.' };
+  var d = obj.data;
+  if (!isObj(d)) return { ok: false, error: 'The backup has no data section.' };
+  if ('records' in d && !isObj(d.records)) return { ok: false, error: 'The progress records in this backup are damaged.' };
+  if ('notes' in d && !Array.isArray(d.notes)) return { ok: false, error: 'The journal notes in this backup are damaged.' };
+  if (!('records' in d) && !('notes' in d) && !('settings' in d)) return { ok: false, error: 'The backup is empty.' };
+  var s = normalizeState(d);
+  var days = Object.keys(s.records).length;
+  return { ok: true, state: s, days: days, notes: s.notes.length };
+}
+function mergeInto(cur, inc) {
+  Object.keys(inc.records).forEach(function (d) {
+    Object.keys(inc.records[d]).forEach(function (t) { if (!(cur.records[d] && cur.records[d][t])) { if (!cur.records[d]) cur.records[d] = {}; cur.records[d][t] = inc.records[d][t]; } });
+  });
+  inc.notes.forEach(function (n) { var mine = cur.notes.filter(function (x) { return x.id === n.id; })[0]; if (!mine) cur.notes.push(n); else if (n.updated > mine.updated) Object.assign(mine, n); });
+  Object.keys(inc.holidays).forEach(function (y) {
+    var list = cur.holidays[y] || (cur.holidays[y] = []);
+    inc.holidays[y].forEach(function (h) { if (!list.some(function (x) { return x.date === h.date; })) list.push(h); });
+  });
+  if (inc.meta.startDate < cur.meta.startDate) { cur.meta.startDate = inc.meta.startDate; cur.meta.startSec = inc.meta.startSec; }
+}
+function handleImportFile(file) {
+  if (!file) return;
+  if (file.size > 25 * 1024 * 1024) { toast('That file is too large to be a backup.', 'err'); return; }
+  var fr = new FileReader();
+  fr.onerror = function () { toast('The file could not be read.', 'err'); };
+  fr.onload = function () {
+    var obj;
+    try { obj = JSON.parse(fr.result); } catch (e) { openModal({ title: 'Not a valid backup', html: '<p>The file is not readable JSON, so nothing was changed.</p>', actions: [{ label: 'OK', cls: 'primary', value: true }] }); return; }
+    var v = validateBackup(obj);
+    if (!v.ok) { openModal({ title: 'Backup rejected', html: '<p>' + esc(v.error) + '</p><p class="small muted">Nothing was changed.</p>', actions: [{ label: 'OK', cls: 'primary', value: true }] }); return; }
+    openModal({ title: 'Restore this backup?', html: '<p>Found <b>' + v.days + '</b> days of records and <b>' + v.notes + '</b> journal notes.</p>' +
+      '<p class="small"><b>Replace everything</b> overwrites the dashboard on this device. <b>Merge</b> adds what is missing and keeps what you already have.</p>',
+      actions: [{ label: 'Cancel', value: null }, { label: 'Merge', value: 'merge' }, { label: 'Replace everything', cls: 'danger', value: 'replace' }] }).then(function (c) {
+      if (!c) return;
+      J.dirty = false; J.activeId = null;
+      if (c === 'replace') state = v.state; else mergeInto(state, v.state);
+      save(); applyTheme(); processExpired(new Date(), true); ui.lastSig = ''; render(); toast('Backup restored.', 'ok');
+    });
+  };
+  fr.readAsText(file);
+}
+
+/* ---- force reset (two confirmations) ---- */
+function forceReset() {
+  openModal({ title: '⚠ FORCE RESET', danger: true,
+    html: '<p>This will permanently delete your current Self-Improvement Dashboard data.</p><p><b>Are you absolutely sure?</b></p>',
+    actions: [{ label: 'CANCEL', value: 'cancel' }, { label: 'Download backup first', value: 'backup' }, { label: 'RESET EVERYTHING', cls: 'danger', value: 'go' }] }).then(function (c) {
+    if (c === 'backup') { exportAllData(); return forceReset(); }
+    if (c !== 'go') return;
+    openModal({ title: '⚠ FINAL CONFIRMATION', danger: true,
+      html: '<p>All progress, streaks, journal notes and settings will be erased. This cannot be undone.</p>', input: { match: 'RESET' },
+      actions: [{ label: 'CANCEL', value: false }, { label: 'DELETE ALL DATA', cls: 'danger', value: true, needsInput: true }] }).then(function (ok) {
+      if (!ok) return;
+      clearTimeout(J.timer); J.dirty = false; J.activeId = null;
+      Store.remove(); state = defaultState(); ui.msgs = {}; ui.lastSig = '';
+      save(); applyTheme(); processExpired(new Date(), true); location.hash = '#/dashboard'; render();
+      toast('Everything was reset. Fresh start.', 'ok', 5000);
+    });
+  });
+}
+
+/* ---- theme ---- */
+function applyTheme() {
+  var t = state.settings.theme, dark = t === 'dark' || (t === 'auto' && window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  var m = document.querySelector('meta[name="theme-color"]'); if (m) m.setAttribute('content', dark ? '#151a2a' : '#fbfbf6');
+}
+
+/* =====================================================================
+   13. TICK / NEW-DAY HANDLING / ERRORS
+   ===================================================================== */
+var lastDay = dateKey(new Date()), errShown = 0;
+function reportError(e) {
+  try { console.error(e); } catch (x) { /* ignore */ }
+  var t = Date.now(); if (t - errShown < 8000) return; errShown = t;
+  toast('Something went wrong, but your saved data is safe. Reload if it keeps happening.', 'err', 6000);
+}
+function sigNow() {
+  var now = new Date(), key = dateKey(now);
+  return key + '|' + (holidayFor(key) ? 'h' : '') + '|' + TASKS.map(function (t) { return taskStatus(key, t, now); }).join(',');
+}
+function handleNewDay(now) {
+  var prevYear = parseInt(lastDay.slice(0, 4), 10), y = now.getFullYear();
+  processExpired(now, true);                   // settles yesterday completely before the new record begins
+  if (y !== prevYear) {
+    if (ui.calYear === prevYear) ui.calYear = y;
+    ui.holYear = y; state.meta.lastOpenYear = y; save();
+    toast('Welcome to ' + y + '! ' + prevYear + ' is saved under Year History.', 'ok', 7000);
+  }
+  ui.msgs = {}; ui.lastSig = '';
+  lastDay = dateKey(now);
+  render();
+}
+function tick() {
+  try {
+    var now = new Date();
+    if (dateKey(now) !== lastDay) handleNewDay(now);
+    else processExpired(now, false);
+    updateLive(now);
+    checkReminders(now);
+    var sig = sigNow();
+    if (sig !== ui.lastSig) {
+      ui.lastSig = sig;
+      if (ui.view === 'dashboard' || ui.view === 'calendar' || ui.view === 'progress') render();
+    }
+  } catch (e) { reportError(e); }
+}
+
+/* =====================================================================
+   14. INITIALIZATION
+   ===================================================================== */
+function init() {
+  Store.init();
+  state = loadState();
+  var now = new Date();
+  if (state.meta.lastOpenYear < now.getFullYear()) {
+    var py = state.meta.lastOpenYear;
+    state.meta.lastOpenYear = now.getFullYear();
+    setTimeout(function () { toast('Welcome to ' + now.getFullYear() + '! ' + py + ' is saved under Year History.', 'ok', 7000); }, 600);
+  }
+  applyTheme();
+  if (window.matchMedia) { try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyTheme); } catch (e) { /* old browsers */ } }
+  processExpired(now, true);                    // catches up on every day the app was closed
+  save();
+  if (!Store.usable) $('#banner').innerHTML = '<div class="callout warn" role="alert">⚠ This browser is blocking storage (private mode or restricted settings). Progress will be lost when you close the tab. Export a backup from Settings often, or open the page in a normal window.</div>';
+
+  buildNav();
+  document.addEventListener('click', function (e) {
+    var el = e.target.closest && e.target.closest('[data-action]'); if (!el) return;
+    var fn = actions[el.dataset.action];
+    if (fn) { try { fn(el, e); } catch (err) { reportError(err); } }
+  });
+  document.addEventListener('change', function (e) {
+    var t = e.target;
+    if (t.id === 'importFile') { handleImportFile(t.files && t.files[0]); return; }
+    if (t.dataset && t.dataset.set) { try { onSettingChange(t); } catch (err) { reportError(err); } }
+  });
+  var tbEl = null;
+  document.addEventListener('mousedown', function (e) {       // keep editor selection when pressing toolbar buttons
+    var b = e.target.closest && e.target.closest('.tb button'); if (b) e.preventDefault();
+  });
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('[data-cmd]'); if (b) runCmd(b.dataset.cmd);
+  });
+  window.addEventListener('hashchange', function () { flushJournal(); render(); window.scrollTo(0, 0); });
+  window.addEventListener('pagehide', flushJournal);
+  document.addEventListener('visibilitychange', function () { if (document.hidden) flushJournal(); else tick(); });
+  window.addEventListener('error', function (e) { reportError(e.error || e.message); });
+  window.addEventListener('unhandledrejection', function (e) { reportError(e.reason); });
+
+  ui.lastSig = sigNow();
+  render();
+  setInterval(tick, 1000);
+  /* Service worker: makes the app installable and lets it open offline. Needs https:// or localhost. */
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () { /* ignore */ }); });
+  }
+}
+init();
+})();
+</script>
+</body>
+</html>
